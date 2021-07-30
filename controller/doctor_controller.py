@@ -7,7 +7,7 @@ class DoctorController(BaseController):
         self.__doctors = []
         self.__system_controller = system_controller
         self.__view = DoctorView()
-        super().__init__(self.__view)
+        super().__init__(self.__view, self.__system_controller)
 
     def find_doctor_by_cpf(self, cpf):
         """
@@ -15,13 +15,6 @@ class DoctorController(BaseController):
         :return: Doctor if found, otherwise None
         """
         return ''
-
-    def return_to_main_menu(self):
-        """
-        Goes back to the system controller view
-        :return: None
-        """
-        return self.__system_controller.open_main_view()
 
     def register_doctor(self):
         self.__view.ask_for_cpf('')

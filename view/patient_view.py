@@ -12,14 +12,15 @@ class PatientView(BaseView):
         """
         print("-------- Hospital Mendes ---------")
         print("------------ Pacientes -------------")
-        print("1 - Cadastrar paciente")
-        print("2 - Alterar paciente")
-        print("3 - Buscar paciente")
+        print("1 - Admitir paciente")
+        print("2 - Dar alta para paciente")
+        print("3 - Ver dados/histórico de um paciente")
         print("4 - Excluir paciente")
         print("5 - Ver fila de atendimento")
+        print("6 - Atualizar estado de saúde de um paciente")
         print("0 - Voltar ao menu principal")
         chosen_option = input("Digite o número da opção desejada: ")
-        return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5})
+        return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6})
 
     @staticmethod
     def show_waiting_line(line: list):
@@ -31,6 +32,17 @@ class PatientView(BaseView):
         for i, patient in enumerate(line):
             print(f'{i + 1}. {patient}')
 
-    @staticmethod
-    def show_msg(msg: str):
-        print(msg)
+    def update_health_status(self, patient):
+        """
+        Displays input to get new pacient health status
+        :param patient: Patient instance
+        :return: new health status
+        """
+        print('Estados possiveis')
+        return input('Novo estado de saúde (atual: Critico): ')
+
+    def ask_for_emergency_contact(self):
+        return input('Contato de emegência (apenas números): ')
+
+    def diagnose(self, pacient):
+        pass

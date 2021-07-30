@@ -17,7 +17,3 @@ class SystemView(BaseView):
         print("0 - Finalizar sistema")
         chosen_option = input("Digite o número da opção desejada: ")
         return self.read_whole_number(chosen_option, {0, 1, 2, 3})
-
-    @staticmethod
-    def display_msg(msg: str):
-        print(msg)

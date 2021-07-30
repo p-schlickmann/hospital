@@ -47,3 +47,7 @@ class BaseView(ABC):
         info['phone_number'] = input('Telefone com DDD (apenas números): ')
         info['date_of_birth'] = input('Data de nascimento (DD/MM/AAAA): ')
         return info
+
+    @staticmethod
+    def display_msg(msg: str):
+        print(msg)

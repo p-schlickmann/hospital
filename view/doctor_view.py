@@ -53,7 +53,3 @@ class DoctorView(BaseView):
         possible_doctors_indexes = set([_ + 1 for _ in range(len(joined_doctors))])
         chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes) + 1
         return list(joined_doctors)[chosen_doctor_index]
-
-    @staticmethod
-    def show_msg(msg):
-        print(msg)
