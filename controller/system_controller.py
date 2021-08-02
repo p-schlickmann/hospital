@@ -23,7 +23,7 @@ class SystemController(BaseController):
             0: self.__patient_controller.return_to_main_menu,
             1: self.__patient_controller.admit_patient,
             2: self.__patient_controller.discharge_patient,
-            3: self.__patient_controller.search_patient,
+            3: self.__patient_controller.get_patient_history_and_data,
             4: self.__patient_controller.delete_patient,
             5: self.__patient_controller.get_patient_line,
             6: self.__patient_controller.update_health_status,

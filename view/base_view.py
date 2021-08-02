@@ -27,27 +27,53 @@ class BaseView(ABC):
                 print(f'Inteiros válidos: {valid_numbers}')
 
     @staticmethod
-    def ask_for_cpf(current_menu_name: str):
+    def format_menu_name_to_fit_hospital_header(name):
+        """
+        Formats passed menu name to add dashes to its side till if fits hospital header
+        :param name: str
+        :return: formatted menu name
+        """
+        name_len = len(name)
+        if name_len >= 33:
+            return name
+        else:
+            name = ' ' + name + ' '
+            name_has_needed_len = len(name) >= 34
+            while not name_has_needed_len:
+                name = '-' + name + '-'
+                name_has_needed_len = len(name) >= 34
+            return name
+
+    def ask_for_cpf(self, current_menu_name: str):
         """
         Asks for CPF
         :return: given cpf
         """
         print("-------- Hospital Mendes ---------")
-        print(current_menu_name)
+        print(self.format_menu_name_to_fit_hospital_header(current_menu_name))
         return input('CPF (apenas números): ')
 
     @staticmethod
     def ask_for_main_info():
         """
         Display main info inputs
-        :return: dict containing info gathered from the inputs
+        :return: tuple containing info gathered from the inputs
         """
-        info = {}
-        info['name'] = input('Nome completo: ')
-        info['phone_number'] = input('Telefone com DDD (apenas números): ')
-        info['date_of_birth'] = input('Data de nascimento (DD/MM/AAAA): ')
-        return info
+        name = input('Nome completo: ')
+        phone_number = input('Telefone com DDD (apenas números): ')
+        date_of_birth = input('Data de nascimento (DD/MM/AAAA): ')
+        return name, phone_number, date_of_birth
 
     @staticmethod
     def display_msg(msg: str):
         print(msg)
+
+    @staticmethod
+    def display_person_info(person):
+        """
+        Checks if person is a patient or a doctor, and then displays info accordingly
+        :param person:
+        :return:
+        """
+        print('person info')
+

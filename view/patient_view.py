@@ -42,7 +42,15 @@ class PatientView(BaseView):
         return input('Novo estado de saúde (atual: Critico): ')
 
     def ask_for_emergency_contact(self):
-        return input('Contato de emegência (apenas números): ')
+        return input('Contato de emergência com DDD (opcional, apenas números): ')
 
     def diagnose(self, pacient):
         pass
+
+    def use_this_registry(self):
+        """
+        Asks if the user wants to use the previously registered patient info
+        :return: True if yes, False otherwise
+        """
+        answer = input('Deseja usar esse cadastro? [s/N]: ')
+        return answer in {'s', 'S'}
