@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from model.doctor import Doctor
+from model.patient import Patient
+
 
 class BaseView(ABC):
     @abstractmethod
@@ -44,13 +47,16 @@ class BaseView(ABC):
                 name_has_needed_len = len(name) >= 34
             return name
 
+    def display_header(self, menu_name):
+        print("-------- Hospital Mendes ---------")
+        print(self.format_menu_name_to_fit_hospital_header(menu_name))
+
     def ask_for_cpf(self, current_menu_name: str):
         """
         Asks for CPF
         :return: given cpf
         """
-        print("-------- Hospital Mendes ---------")
-        print(self.format_menu_name_to_fit_hospital_header(current_menu_name))
+        self.display_header(current_menu_name)
         return input('CPF (apenas números): ')
 
     @staticmethod
@@ -72,8 +78,26 @@ class BaseView(ABC):
     def display_person_info(person):
         """
         Checks if person is a patient or a doctor, and then displays info accordingly
-        :param person:
-        :return:
+        :param person: patient or doctor instance
+        :return: None
         """
-        print('person info')
+        if isinstance(person, Doctor):
+            pass
+        elif isinstance(person, Patient):
+            print(f'---- {person.name} ----')
+            print(f'Data de nascimento: {person.date_of_birth}')
+            print(f'CPF: {person.cpf}')
+            print(f'Celular: {person.phone_number}')
+            arrived_at = person.arrived_at
+            if arrived_at:
+                print(f'Chegou: {arrived_at}')
+            admitted_at = person.admitted_at
+            if admitted_at:
+                print(f'Admitido em: {admitted_at}')
+            discharged_at = person.discharged_at
+            if discharged_at:
+                print(f'Alta: {discharged_at}')
+            print(f'Contato de emergência: {person.emergency_contact}')
+            print(f'---- {person.name} ----')
+
 
