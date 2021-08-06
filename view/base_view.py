@@ -81,13 +81,14 @@ class BaseView(ABC):
         :param person: patient or doctor instance
         :return: None
         """
+        print(f'---- {person.name} ----')
+        print(f'Data de nascimento: {person.date_of_birth}')
+        print(f'CPF: {person.cpf}')
+        print(f'Celular: {person.phone_number}')
         if isinstance(person, Doctor):
-            pass
+            print(f'Salário: {person.salary}')
+            print(f'De plantão: {person.on_call}')
         elif isinstance(person, Patient):
-            print(f'---- {person.name} ----')
-            print(f'Data de nascimento: {person.date_of_birth}')
-            print(f'CPF: {person.cpf}')
-            print(f'Celular: {person.phone_number}')
             if not only_base_info:
                 arrived_at = person.arrived_at
                 if arrived_at:
@@ -104,4 +105,6 @@ class BaseView(ABC):
             print(f'Contato de emergência: {person.emergency_contact}')
             print(f'---- {person.name} ----')
 
-
+    @staticmethod
+    def confirm_action(msg):
+        return input(f'[?] {msg}? [s/N]: ') in {'s', 'S'}

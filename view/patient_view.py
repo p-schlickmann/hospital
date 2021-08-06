@@ -93,10 +93,6 @@ class PatientView(BaseView):
                 break
         return symptoms
 
-    @staticmethod
-    def confirm_action(msg):
-        return input(f'[?] {msg}? [s/N]: ') in {'s', 'S'}
-
     def display_patient_condition(self, patient):
         print('1 vez no hospital.')
         print('Doenças: ')

@@ -22,18 +22,23 @@ class DoctorView(BaseView):
         chosen_option = input("Digite o número da opção desejada: ")
         return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6})
 
-    def display_register_doctor(self, cpf):
-        info = self.ask_for_main_info()
-        info['cpf'] = cpf
-        info['salary'] = self.read_whole_number(input('Salário anual (apenas números): '))
+    def display_register_doctor(self):
+        name, phone, birth = self.ask_for_main_info()
+        salary = self.read_whole_number(input('Salário anual (apenas números): '))
+        return name, phone, birth, salary
 
     def display_edit_doctor(self, doctor):
-        pass
+        print('[+] Pressione `Enter` para pular.')
+        name = input(f'Nome [{doctor.name}]: ')
+        cpf = input(f'CPF [{doctor.cpf}]: ')
+        phone = input(f'Celular [{doctor.phone_number}]: ')
+        birth = input(f'Data de nascimento [{doctor.date_of_birth}]: ')
+        salary = input(f'Salário [{doctor.salary}]: ')
+        on_call = input(f'De plantão [{"sim" if doctor.on_call else "nao"}]: ')
+        return cpf, name, phone, birth, salary, on_call
 
     @staticmethod
     def list_on_call_doctors(doctors):
-        print("-------- Hospital Mendes ---------")
-        print("------- Médicos de plantão -------")
         for doctor in doctors:
             print(doctor)
 
@@ -44,12 +49,10 @@ class DoctorView(BaseView):
         :param doctors: List of available doctors, but not on call
         :return: chosen doctor
         """
-        print("-------- Hospital Mendes ---------")
-        print("------- Médicos disponíveis ------")
-        joined_doctors = set(on_call_doctors + doctors)
+        joined_doctors = list(set(on_call_doctors + doctors))
         for i, doctor in enumerate(joined_doctors):
-            print(f'[{i}] {doctor}', ' - PLANTÃO' if doctor in on_call_doctors else '')
+            print(f'[{i + 1}] {doctor}', ' - PLANTÃO' if doctor in on_call_doctors else '')
         chosen_doctor = input('Digite o número do lado do nome do médico que você deseja ligar: ')
-        possible_doctors_indexes = set([_ + 1 for _ in range(len(joined_doctors))])
-        chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes) + 1
-        return list(joined_doctors)[chosen_doctor_index]
+        possible_doctors_indexes = {idx for idx, doc in enumerate(joined_doctors)}
+        chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes) - 1
+        return joined_doctors[chosen_doctor_index]
