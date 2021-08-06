@@ -15,16 +15,21 @@ class PatientController(BaseController):
         self.__view = PatientView()
         super().__init__(self.__view, self.__system_controller)
 
-    def find_patient_by_cpf(self, cpf, display_not_found_msg=False):
+    def find_patient_by_cpf(self, cpf, display_not_found_msg=False, not_discharged=False):
         """
         Searches for patient with the given cpf
         :return: Patient if found, otherwise None
         """
-        patients_found = [patient for patient in self.__patients if patient.cpf == cpf]
-        if len(patients_found) > 1:
-            self.__view.display_msg(f'[!] Erro no sistema! Dois pacientes foram encontrados com o mesmo cpf {patients_found}.')
-            raise SystemError
-        elif not patients_found and display_not_found_msg:
+        if not_discharged:
+            patients_found = [
+                patient for patient in self.__patients
+                if patient.cpf == cpf and not patient.discharged_at
+            ]
+        else:
+            patients_found = [
+                patient for patient in self.__patients if patient.cpf == cpf
+            ]
+        if not patients_found and display_not_found_msg:
             self.__view.display_msg(f'[-] Nenhum paciente foi encontrado com esse CPF ({cpf}).')
             self.__view.display_msg('[!] Verifique se o cpf é valido e foi digitado apenas com números.')
         else:
@@ -68,15 +73,12 @@ class PatientController(BaseController):
     def admit_patient(self):
         menu_name = 'Admitir paciente'
         cpf = self.__view.ask_for_cpf(menu_name)
-        try:
-            patient = self.find_patient_by_cpf(cpf)
-        except SystemError:
-            return
+        patient = self.find_patient_by_cpf(cpf)
         if patient is None:
             new_patient = self.ask_for_patient_info_and_create_patient(cpf)
         else:
             self.__view.display_msg('[+] Encontramos um cadastro previamente preenchido para esse paciente:')
-            self.__view.display_person_info(patient)
+            self.__view.display_person_info(patient, only_base_info=True)
             use_this_registry = self.__view.use_this_registry()
             if use_this_registry:
                 arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
@@ -148,23 +150,17 @@ class PatientController(BaseController):
     def discharge_patient(self):
         menu_name = 'Dar alta para um paciente'
         cpf = self.__view.ask_for_cpf(menu_name)
-        try:
-            patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
-        except SystemError:
-            return
+        patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
         if patient is not None:
             self.__view.display_person_info(patient)
-            if self.__view.confirm_discharge():
+            if self.__view.confirm_action('Dar alta para o paciente encontrado?'):
                 patient.discharged_at = datetime.now()
                 self.__view.display_msg(f'[+] {patient.name} recebeu alta!')
 
     def get_patient_history_and_data(self):
         menu_name = 'Ver dados/histórico de um paciente'
         cpf = self.__view.ask_for_cpf(menu_name)
-        try:
-            patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
-        except SystemError:
-            return
+        patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
         if patient is not None:
             previous_admittions = [patient for patient in self.__patients if patient.cpf == cpf]
             self.__view.display_patient_history(previous_admittions)
@@ -176,13 +172,23 @@ class PatientController(BaseController):
         """
         menu_name = "Excluir paciente"
         cpf = self.__view.ask_for_cpf(menu_name)
-        patient = self.find_patient_by_cpf(cpf)
+        patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
+        if patient is not None:
+            self.__view.display_person_info(patient, only_base_info=True)
+            confirmed = self.__view.confirm_action('Deletar todas as informações do paciente selecionado?')
+            if confirmed:
+                self.__patients = [patient for patient in self.__patients if patient.cpf == cpf]
+                self.__view.display_msg('[+] Dados e histórico do paciente excluídos com sucesso!')
 
     def get_patient_line(self):
-        return []
+        self.__view.show_waiting_line(self.__patients_line)
 
     def update_health_status(self):
-        menu_name = 'atualizar paciente'
+        menu_name = 'Atualizar estado de saúde de um paciente'
         cpf = self.__view.ask_for_cpf(menu_name)
-        patient = self.find_patient_by_cpf(cpf)
-        self.__view.update_health_status(patient)
+        patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
+        if patient is not None:
+            possible_status = ['Saudável', 'Estável', 'Crítico', 'Morto']
+            status_idx = self.__view.update_health_status(possible_status, patient)
+            patient.health_status.status = possible_status[status_idx]
+            self.__view.display_msg('[+] Estado de saúde do paciente atualizado com sucesso!')

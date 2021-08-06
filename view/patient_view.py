@@ -33,14 +33,18 @@ class PatientView(BaseView):
         for i, patient in enumerate(line):
             print(f'{i + 1}. {patient}')
 
-    def update_health_status(self, patient):
+    def update_health_status(self, possible_status, patient):
         """
         Displays input to get new pacient health status
+        :param possible_status: list of possible health status a patient can have
         :param patient: Patient instance
         :return: new health status
         """
-        print('Estados possiveis')
-        return input('Novo estado de saúde (atual: Critico): ')
+        print('Selecione o novo estado de saúde do paciente encontrado')
+        for status in possible_status:
+            print(f'[1] {status} {"(atual)" if status == patient.health_status.status else ""}')
+        possible_indexes = {idx for idx, status in enumerate(possible_status)}
+        return self.read_whole_number(input('Digite o número do status desejado: '), possible_indexes) - 1
 
     @staticmethod
     def ask_for_emergency_contact():
@@ -90,11 +94,17 @@ class PatientView(BaseView):
         return symptoms
 
     @staticmethod
-    def confirm_discharge():
-        return input('[?] Dar alta para o paciente encontrado? [s/N]: ') in {'s', 'S'}
+    def confirm_action(msg):
+        return input(f'[?] {msg}? [s/N]: ') in {'s', 'S'}
 
     def display_patient_condition(self, patient):
-        return 'dados'
+        print('1 vez no hospital.')
+        print('Doenças: ')
+        for illness in patient.ilnesses:
+            print(f'- {illness}')
+        print('Sintomas: ')
+        for symptom in patient.symptoms:
+            print(f'- {symptom}')
 
     def display_patient_history(self, previous_admittions):
         if not previous_admittions:

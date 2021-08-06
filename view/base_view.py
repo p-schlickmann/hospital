@@ -21,7 +21,7 @@ class BaseView(ABC):
         """
         try:
             chosen_number_int = int(chosen_number)
-            if chosen_number_int not in valid_numbers:
+            if valid_numbers and chosen_number_int not in valid_numbers:
                 raise ValueError
             return chosen_number_int
         except ValueError:
@@ -75,7 +75,7 @@ class BaseView(ABC):
         print(msg)
 
     @staticmethod
-    def display_person_info(person):
+    def display_person_info(person, only_base_info=False):
         """
         Checks if person is a patient or a doctor, and then displays info accordingly
         :param person: patient or doctor instance
@@ -88,15 +88,19 @@ class BaseView(ABC):
             print(f'Data de nascimento: {person.date_of_birth}')
             print(f'CPF: {person.cpf}')
             print(f'Celular: {person.phone_number}')
-            arrived_at = person.arrived_at
-            if arrived_at:
-                print(f'Chegou: {arrived_at}')
-            admitted_at = person.admitted_at
-            if admitted_at:
-                print(f'Admitido em: {admitted_at}')
-            discharged_at = person.discharged_at
-            if discharged_at:
-                print(f'Alta: {discharged_at}')
+            if not only_base_info:
+                arrived_at = person.arrived_at
+                if arrived_at:
+                    print(f'Chegou: {arrived_at}')
+                admitted_at = person.admitted_at
+                if admitted_at:
+                    print(f'Admitido em: {admitted_at}')
+                doctors = person.doctors
+                if doctors:
+                    print(f'Médicos: {doctors}')
+                discharged_at = person.discharged_at
+                if discharged_at:
+                    print(f'Alta: {discharged_at}')
             print(f'Contato de emergência: {person.emergency_contact}')
             print(f'---- {person.name} ----')
 
