@@ -23,22 +23,24 @@ class LogView(BaseView):
     def new_log(self):
         """
         Displays new logs required inputs
-        :return: dict with the information gathered from the inputs
+        :return: tuple with the information gathered from the inputs
         """
-        info = {}
-        info['title'] = input('Título: ')
-        info['description'] = input('Descrição: ')
-        return info
+        id = input('Id: ')
+        title = input('Título: ')
+        desc = input('Descrição: ')
+        return id, title, desc
 
-    def edit_log(self, log):
+    def ask_for_log_id(self):
+        return input('Id do log: ')
+
+    def edit_log(self):
         """
         Displays edit logs required inputs
-        :return: dict with the information gathered from the inputs
+        :return: tuple with the information gathered from the inputs
         """
-        info = {}
-        info['title'] = input('Título (atual: titulo aleatorio): ')
-        info['description'] = input('Descrição (atual: titulo aleatorio): ')
-        return info
+        title = input('Título (atual: titulo aleatorio): ')
+        desc = input('Descrição (atual: titulo aleatorio): ')
+        return title, desc
 
     def list_logs(self, logs: list):
         """
