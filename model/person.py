@@ -2,5 +2,40 @@ from abc import ABC, abstractmethod
 
 
 class Person(ABC):
-    def __init__(self, name, phone_number, cpf, date_of_birth):
-        pass
+    def __init__(self, name: str, phone_number: int, cpf: int, date_of_birth: datetime):
+        self.__name = name
+        self.__phone_number = phone_number
+        self.__cpf = cpf
+        self.__date_of_birth = date_of_birth
+    
+    @property
+    def name(self):
+        return self.__name
+    
+    @name.setter
+    def name(self, name: str):
+        self.__name = name
+        
+    @property
+    def phone_number(self):
+        return self.__phone_number
+    
+    @phone_number.setter
+    def phone_number(self, phone_number: int):
+        self.__phone_number = phone_numebr
+        
+    @property
+    def cpf(self):
+        return self.__cpf
+    
+    @cpf.setter
+    def cpf(self, cpf: int):
+        self.__cpf = cpf
+        
+    @property
+    def date_of_birth(self):
+        return self.__date_of_birth
+    
+    date_of_birth.setter
+    def date_of_birth(self, date_of_birth: datetime):
+        self.__date_of_birth = date_of_birth
