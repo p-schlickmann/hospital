@@ -2,7 +2,7 @@ from model.person import Person
 
 
 class Doctor(Person):
-    def __init__(self, name =  str, phone_number: int, cpf: int, date_of_birth: datetime, salary: int, on_call: bool, available = bool):
+    def __init__(self, name:  str, phone_number: int, cpf: int, date_of_birth: datetime, salary: int, on_call: bool, available: bool):
         self.__name = name
         self.__phone_number = phone_number
         self.__cpf = cpf
