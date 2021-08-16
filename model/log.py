@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Log:
     def __init__(self, id: int, title: str, description: str, happened_at: datetime):
         self.__id = id
@@ -22,7 +25,7 @@ class Log:
         self.__title = title
         
     @property
-    defdescription(self):
+    def description(self):
         return self.__description
     
     @description.setter

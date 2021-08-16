@@ -1,29 +1,34 @@
+from datetime import datetime
+
 from model.person import Person
-from doctor import Doctor
-from illness import Illness
-from synptom import Symptoms
-from health_status import health_status
+from model.doctor import Doctor
+from model.illness import Illness
+from model.symptom import Symptom
+from model.health_status import HealthStatus
 
 
 class Patient(Person):
-    def __init__(self, name: str, phone_number: int, cpf: int, date_of_birth: datetime, emergency_contact: int, arrived_at: datetime, admitted_at: datetime, discharged_at: datetime, health_status: Health_status):
-        self.__name = name
-        self.__phone_number = phone_number
-        self.__cpf = cpf
-        self.__date_of_birth = date_of_birth
+    def __init__(self, name: str, phone_number: str, cpf: str, date_of_birth: datetime,
+                 emergency_contact: str, arrived_at: datetime):
+        super().__init__(name, phone_number, cpf, date_of_birth)
         self.__emergency_contact = emergency_contact
         self.__arrived_at = arrived_at
-        self.__admitted_at = admitted_at
+        self.__admitted_at = None
+        self.__discharged_at = None
+        self.__health_status = None
         self.__doctors = []
         self.__illnesses = []
         self.__symptoms = []
-        
+
+    def __str__(self):
+        return f'{self.cpf} | {self.name}'
+
     @property
     def emergency_contact(self):
         return self.__emergency_contact
     
     @emergency_contact.setter
-    def emergency_contact(self, emergency_contact:int):
+    def emergency_contact(self, emergency_contact: str):
         self.__emergency_contact = emergency_contact
         
     @property
@@ -55,7 +60,7 @@ class Patient(Person):
         return self.__health_status
     
     @health_status.setter
-    def health_status(self, health_status: Health_status):
+    def health_status(self, health_status: HealthStatus):
         self.__health_status = health_status
         
     def add_doctor(self, doctor: Doctor):
@@ -66,24 +71,23 @@ class Patient(Person):
     def remove_doctor(self, doctor: Doctor):
         if (doctor is not None) and (isinstance(doctor, Doctor)):
             if doctor in self.__doctors:
-                self.__remove(doctor)
+                self.__doctors.remove(doctor)
                 
     def add_illness(self, illness: Illness):
         if (illness is not None) and (isinstance(illness, Illness)):
             if illness not in self.__illnesses:
                 self.__illnesses.append(illness)
                 
-    def remove_illness(self, illness: Ilness):
+    def remove_illness(self, illness: Illness):
         if (illness is not None) and (isinstance(illness, Illness)):
             if illness in self.__illnesses:
-                self.__remove(illness)
+                self.__illnesses.remove(illness)
                 
-    def add_symptom(self, sympton.name, sympton.description, symptom.discomfort_level):
+    def add_symptom(self, name, description, discomfort_level):
+        symptom = Symptom(name, description, discomfort_level)
         if (symptom is not None) and (isinstance(symptom, Symptom)):
             if symptom not in self.__symptoms:
                 self.__symptoms.append(symptom)
                 
-    def remove_symptom(self, sympton.id):
-        if (symptom is not None) and (isinstance(symptom, Symptom)):
-            if symptom in self.__symptom:
-                self.__remove(symptom)
+    def remove_symptom(self, symptom_id):
+        self.__symptoms = [symptom for symptom in self.__symptoms if symptom.id == symptom_id]

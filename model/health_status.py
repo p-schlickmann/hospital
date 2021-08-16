@@ -7,5 +7,5 @@ class HealthStatus:
         return self.__status
     
     @status.setter
-    def statuys(self, status: str):
+    def status(self, status: str):
         self.__status = status

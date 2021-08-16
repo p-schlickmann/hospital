@@ -1,7 +1,7 @@
 class Symptom:
     def __init__(self, name: str, description: str, discomfort_level: int, id: int):
         self.__name = name
-        self.__description+ description
+        self.__description = description
         self.__discomfort_level = discomfort_level
         self.__id = id
         

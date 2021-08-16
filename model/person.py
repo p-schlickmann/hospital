@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 
 class Person(ABC):
-    def __init__(self, name: str, phone_number: int, cpf: int, date_of_birth: datetime):
+    def __init__(self, name: str, phone_number: str, cpf: str, date_of_birth: datetime):
         self.__name = name
         self.__phone_number = phone_number
         self.__cpf = cpf
@@ -21,21 +22,21 @@ class Person(ABC):
         return self.__phone_number
     
     @phone_number.setter
-    def phone_number(self, phone_number: int):
-        self.__phone_number = phone_numebr
+    def phone_number(self, phone_number: str):
+        self.__phone_number = phone_number
         
     @property
     def cpf(self):
         return self.__cpf
     
     @cpf.setter
-    def cpf(self, cpf: int):
+    def cpf(self, cpf: str):
         self.__cpf = cpf
         
     @property
     def date_of_birth(self):
         return self.__date_of_birth
     
-    date_of_birth.setter
+    @date_of_birth.setter
     def date_of_birth(self, date_of_birth: datetime):
         self.__date_of_birth = date_of_birth
