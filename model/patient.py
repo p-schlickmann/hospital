@@ -1,4 +1,7 @@
 from model.person import Person
+from doctor import Doctor
+from illness import Illness
+from synptom import Symptoms
 
 
 class Patient(Person):
@@ -10,6 +13,9 @@ class Patient(Person):
         self.__emergency_contact = emergency_contact
         self.__arrived_at = arrived_at
         self.__admitted_at = admitted_at
+        self.__doctors = []
+        self.__illnesses = []
+        self.__symptoms = []
         
     @property
     def emergency_contact(self):
@@ -43,3 +49,32 @@ class Patient(Person):
     def discharged_at(self):
         self.__discharged_at = discharged_at
         
+    def add_doctor(self, doctor: Doctor):
+        if (doctor is not None) and (isinstance(doctor, Doctor)):
+            if doctor not in self.__doctors:
+                self.__doctors.append(doctor)
+                
+    def remove_doctor(self, doctor: Doctor):
+        if (doctor is not None) and (isinstance(doctor, Doctor)):
+            if doctor in self.__doctors:
+                self.__remove(doctor)
+                
+    def add_illness(self, illness: Illness):
+        if (illness is not None) and (isinstance(illness, Illness)):
+            if illness not in self.__illnesses:
+                self.__illnesses.append(illness)
+                
+    def remove_illness(self, illness: Ilness):
+        if (illness is not None) and (isinstance(illness, Illness)):
+            if illness in self.__illnesses:
+                self.__remove(illness)
+                
+    def add_symptom(self, sympton.name, sympton.description, symptom.discomfort_level):
+        if (symptom is not None) and (isinstance(symptom, Symptom)):
+            if symptom not in self.__symptoms:
+                self.__symptoms.append(symptom)
+                
+    def remove_symptom(self, sympton.id):
+        if (symptom is not None) and (isinstance(symptom, Symptom)):
+            if symptom in self.__symptom:
+                self.__remove(symptom)
