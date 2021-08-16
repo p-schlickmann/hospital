@@ -31,7 +31,7 @@ class LogController(BaseController):
         id = self.__view.ask_for_log_id()
         log = self.find_log_by_id(id)
         if log is not None:
-            title, desc = self.__view.edit_log()
+            title, desc = self.__view.edit_log(log)
             if title:
                 log.title = title
             if desc:
@@ -48,6 +48,10 @@ class LogController(BaseController):
         log_to_remove = self.find_log_by_id(id)
         if log_to_remove is not None:
             self.__logs = [log for log in self.__logs if log.id != log_to_remove.id]
+            self.__view.display_msg('[+] Log excluído com sucesso!')
 
     def list_logs(self):
+        self.__view.display_header('Listar logs')
+        if not self.__logs:
+            self.__view.display_msg('[-] O hospital ainda não tem logs.')
         self.__view.list_logs(self.__logs)

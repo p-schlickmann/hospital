@@ -10,8 +10,7 @@ class DoctorView(BaseView):
         Displays system options
         :return: chosen option
         """
-        print("-------- Hospital Mendes ---------")
-        print("------------ Médicos -------------")
+        self.display_header('Médicos')
         print("1 - Cadastrar médico")
         print("2 - Alterar médico")
         print("3 - Buscar médico")
@@ -34,11 +33,12 @@ class DoctorView(BaseView):
         phone = input(f'Celular [{doctor.phone_number}]: ')
         birth = input(f'Data de nascimento [{doctor.date_of_birth}]: ')
         salary = input(f'Salário [{doctor.salary}]: ')
-        on_call = input(f'De plantão [{"sim" if doctor.on_call else "nao"}]: ')
+        on_call = input(f'De plantão [{"sim" if doctor.on_call else "nao"}](s/N): ')
         return cpf, name, phone, birth, salary, on_call
 
-    @staticmethod
-    def list_on_call_doctors(doctors):
+    def list_on_call_doctors(self, doctors):
+        if not doctors:
+            self.display_msg('[!] Nenhum médico está de plantão!')
         for doctor in doctors:
             print(doctor)
 
@@ -51,8 +51,10 @@ class DoctorView(BaseView):
         """
         joined_doctors = list(set(on_call_doctors + doctors))
         for i, doctor in enumerate(joined_doctors):
-            print(f'[{i + 1}] {doctor}', ' - PLANTÃO' if doctor in on_call_doctors else '')
-        chosen_doctor = input('Digite o número do lado do nome do médico que você deseja ligar: ')
-        possible_doctors_indexes = {idx for idx, doc in enumerate(joined_doctors)}
-        chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes) - 1
-        return joined_doctors[chosen_doctor_index]
+            print(f'[{i + 1}] {doctor.name}', ' - PLANTÃO' if doctor in on_call_doctors else '')
+        chosen_doctor = input('Digite o número do lado do nome do médico que você deseja chamar: ')
+        possible_doctors_indexes = {idx + 1 for idx, doc in enumerate(joined_doctors)}
+        chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes)
+        if chosen_doctor_index:
+            return joined_doctors[chosen_doctor_index - 1]
+

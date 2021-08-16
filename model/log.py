@@ -7,6 +7,9 @@ class Log:
         self.__title = title
         self.__description = description
         self.__happened_at = happened_at
+
+    def __str__(self):
+        return f'{self.id} | {self.title} | {self.happened_at}'
         
     @property
     def id(self):

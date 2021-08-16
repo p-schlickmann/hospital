@@ -10,7 +10,10 @@ class Doctor(Person):
         self.__salary = salary
         self.__on_call = on_call
         self.__available = available
-        
+
+    def __str__(self):
+        return f'{self.cpf} | {self.name}'
+
     @property
     def salary(self):
         return self.__salary

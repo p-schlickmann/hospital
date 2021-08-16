@@ -10,6 +10,7 @@ class SystemView(BaseView):
         Displays system options
         :return: chosen option
         """
+        print('')
         print("-------- Hospital Mendes ---------")
         print("1 - Pacientes")
         print("2 - Médicos")

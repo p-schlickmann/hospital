@@ -48,6 +48,7 @@ class BaseView(ABC):
             return name
 
     def display_header(self, menu_name):
+        print('')
         print("-------- Hospital Mendes ---------")
         print(self.format_menu_name_to_fit_hospital_header(menu_name))
 
@@ -87,7 +88,7 @@ class BaseView(ABC):
         print(f'Celular: {person.phone_number}')
         if isinstance(person, Doctor):
             print(f'Salário: {person.salary}')
-            print(f'De plantão: {person.on_call}')
+            print(f'De plantão: {"sim" if person.on_call else "nao"}')
         elif isinstance(person, Patient):
             if not only_base_info:
                 arrived_at = person.arrived_at
@@ -103,7 +104,7 @@ class BaseView(ABC):
                 if discharged_at:
                     print(f'Alta: {discharged_at}')
             print(f'Contato de emergência: {person.emergency_contact}')
-            print(f'---- {person.name} ----')
+        print(f'---- {person.name} ----')
 
     @staticmethod
     def confirm_action(msg):

@@ -62,32 +62,82 @@ class Patient(Person):
     @health_status.setter
     def health_status(self, health_status: HealthStatus):
         self.__health_status = health_status
+
+    @property
+    def doctors(self):
+        return self.__doctors
         
     def add_doctor(self, doctor: Doctor):
+        """
+        Adds doctor to doctors list
+        :param doctor: Doctor instance
+        :return: the added doctor if successful, None otherwise
+        """
         if (doctor is not None) and (isinstance(doctor, Doctor)):
             if doctor not in self.__doctors:
                 self.__doctors.append(doctor)
+                return doctor
                 
     def remove_doctor(self, doctor: Doctor):
+        """
+        Removes doctor from doctors list
+        :param doctor: Doctor instance
+        :return: True if successful, False otherwise
+        """
         if (doctor is not None) and (isinstance(doctor, Doctor)):
             if doctor in self.__doctors:
                 self.__doctors.remove(doctor)
-                
+                return True
+        return False
+
+    @property
+    def illnesses(self):
+        return self.__illnesses
+
     def add_illness(self, illness: Illness):
+        """
+        Adds illness to illnesses list
+        :param illness: Illness instance
+        :return: added illness if successful, otherwise None
+        """
         if (illness is not None) and (isinstance(illness, Illness)):
             if illness not in self.__illnesses:
                 self.__illnesses.append(illness)
-                
+                return illness
+
     def remove_illness(self, illness: Illness):
+        """
+        Removes illness from illnesses list
+        :param illness: Illness instance
+        :return: True if successful, False otherwise
+        """
         if (illness is not None) and (isinstance(illness, Illness)):
             if illness in self.__illnesses:
                 self.__illnesses.remove(illness)
-                
+                return True
+        return False
+
+    @property
+    def symptoms(self):
+        return self.__symptoms
+
+    def symptom_id_available(self, symptom_id):
+        return not [symptom for symptom in self.__symptoms if symptom.id == symptom_id]
+
     def add_symptom(self, name, description, discomfort_level):
-        symptom = Symptom(name, description, discomfort_level)
-        if (symptom is not None) and (isinstance(symptom, Symptom)):
-            if symptom not in self.__symptoms:
-                self.__symptoms.append(symptom)
+        """
+        Adds symptom to symptoms list
+        Auto increments symptom id
+        :return: added symptom if successful, otherwise None
+        """
+        *_, last_symptom = self.__symptoms
+        new_symptom_id = last_symptom.id + 1
+        id_available = self.symptom_id_available(new_symptom_id)
+        while not id_available:
+            new_symptom_id = new_symptom_id + 1
+            id_available = self.symptom_id_available(new_symptom_id)
+        symptom = Symptom(name, description, discomfort_level, new_symptom_id)
+        self.__symptoms.append(symptom)
                 
     def remove_symptom(self, symptom_id):
         self.__symptoms = [symptom for symptom in self.__symptoms if symptom.id == symptom_id]

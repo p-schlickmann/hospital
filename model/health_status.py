@@ -5,7 +5,3 @@ class HealthStatus:
     @property
     def status(self):
         return self.__status
-    
-    @status.setter
-    def status(self, status: str):
-        self.__status = status

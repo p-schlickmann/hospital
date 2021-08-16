@@ -10,8 +10,7 @@ class LogView(BaseView):
         Displays system options
         :return: chosen option
         """
-        print("-------- Hospital Mendes ---------")
-        print("------------- Logs ---------------")
+        self.display_header('Logs')
         print("1 - Novo log")
         print("2 - Editar log")
         print("3 - Excluir log")
@@ -33,13 +32,14 @@ class LogView(BaseView):
     def ask_for_log_id(self):
         return input('Id do log: ')
 
-    def edit_log(self):
+    def edit_log(self, log):
         """
         Displays edit logs required inputs
         :return: tuple with the information gathered from the inputs
         """
-        title = input('Título (atual: titulo aleatorio): ')
-        desc = input('Descrição (atual: titulo aleatorio): ')
+        print('[+] Pressione `Enter` para pular.')
+        title = input(f'Título [{log.title}]: ')
+        desc = input(f'Descrição [{log.description}]: ')
         return title, desc
 
     def list_logs(self, logs: list):

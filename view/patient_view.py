@@ -10,8 +10,7 @@ class PatientView(BaseView):
         Displays system options
         :return: chosen option
         """
-        print("-------- Hospital Mendes ---------")
-        print("------------ Pacientes -------------")
+        self.display_header('Pacientes')
         print("1 - Admitir paciente")
         print("2 - Atender paciente da fila")
         print("3 - Dar alta para paciente")
