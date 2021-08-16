@@ -113,11 +113,13 @@ class PatientView(BaseView):
                 self.display_patient_condition(patient, idx + 1)
 
     def get_doctors_that_diagnosed_the_patient(self):
-        print('Digite o CPF de um dos médicos que atendeu esse paciente: ')
+        print('Digite o CPF de um dos médicos que atendeu esse paciente (deixar em branco para pular): ')
         cpfs = []
         add_another = True
         while add_another:
             cpf = input('CPF: ')
             cpfs.append(cpf)
+            if not cpf:
+                break
             add_another = self.confirm_action('Adicionar outro médico?')
         return cpfs

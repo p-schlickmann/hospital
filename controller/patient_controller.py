@@ -116,52 +116,11 @@ class PatientController(BaseController):
         :return: None
         """
         line = self.__patients_line
-        patient_to_be_appended = {'patient': patient, 'severity': illness_severity}
-        if not line:
-            self.__patients_line.append(patient_to_be_appended)
-        else:
-            first_patient = line[0]
-            if first_patient['severity'] < illness_severity:
-                self.__patients_line = [patient_to_be_appended] + line
-            else:
-                indexes_of_patients_with_the_same_severity = [
-                    index for index, patient in enumerate(line) if patient['severity'] == illness_severity
-                ]
-                if not indexes_of_patients_with_the_same_severity:
-                    # find the first patient in line that has a lower severity then passed patient
-                    try:
-                        index_of_the_first_patient_with_less_severity = [
-                            index for index, patient in enumerate(line) if patient['severity'] < illness_severity
-                        ][0]
-                        cutting_point = index_of_the_first_patient_with_less_severity - 1
-                        self.__patients_line = line[0:cutting_point] + [patient_to_be_appended] + line[cutting_point:]
-                    except IndexError:
-                        self.__patients_line.append(patient_to_be_appended)
-                else:
-                    # tie break based on arrival time
-                    for patient_index in indexes_of_patients_with_the_same_severity:
-                        found_patient = line[patient_index]
-                        if found_patient['patient'].arrived_at < patient.arrived_at:
-                            # if found patient arrived earlier then we did,
-                            # check if the next patient with the same severity arrived after we did
-                            # if both are true, append the patient between them
-                            try:
-                                next_patient_in_line = line[patient_index + 1]
-                                if next_patient_in_line['severity'] != illness_severity:
-                                    raise IndexError
-                            except IndexError:
-                                # there was no patient with the same severity further down the line,
-                                # so we can append this new patient right after this last one
-                                cutting_point = patient_index + 1
-                                self.__patients_line = line[0:cutting_point] + [patient_to_be_appended] + line[cutting_point:]
-                                break
-                            else:
-                                # there was a next patient in line with the same severity
-                                # now if this patient arrived after this one, we should append this one before him.
-                                if next_patient_in_line['patient'].arrived_at > patient.arrived_at:
-                                    cutting_point = patient_index + 1
-                                    self.__patients_line = line[0:cutting_point] + [patient_to_be_appended] + line[cutting_point:]
-                                    break
+        delta = datetime.now() - patient.arrived_at
+        patient_to_be_appended = {'patient': patient, 'severity': illness_severity, 'delta': delta}
+        line.append(patient_to_be_appended)
+        line.sort(key=lambda x: (x['severity'], x['delta']), reverse=True)
+        self.__patients_line = line
 
     def discharge_patient(self):
         self.__view.display_header('Dar alta para um paciente')
@@ -193,7 +152,8 @@ class PatientController(BaseController):
             self.__view.display_person_info(patient, only_base_info=True)
             confirmed = self.__view.confirm_action('Deletar todas as informações do paciente selecionado?')
             if confirmed:
-                self.__patients = [patient for patient in self.__patients if patient.cpf == cpf]
+                self.__patients_line = [patient for patient in self.__patients_line if patient['patient'].cpf != cpf]
+                self.__patients = [patient for patient in self.__patients if patient.cpf != cpf]
                 self.__view.display_msg('[+] Dados e histórico do paciente excluídos com sucesso!')
 
     def get_patient_line(self):

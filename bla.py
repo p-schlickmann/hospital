@@ -22,6 +22,11 @@ def add_patient_to_line(line, patient, illness_severity):
     :return: None
     """
     passed_line = line
+    delta = datetime.now() - patient.arrived_at
+    patient = {'patient': patient.nome, 'severity': illness_severity, 'delta': delta, 'arrived_at': patient.arrived_at}
+    passed_line.append(patient)
+    passed_line.sort(key=lambda x: (x['severity'], x['delta']), reverse=True)
+    return passed_line
     patient_to_be_appended = {'patient': patient, 'severity': illness_severity, 'nome':patient.__str__()}
     if not passed_line:
         passed_line.append(patient_to_be_appended)
@@ -70,6 +75,12 @@ def add_patient_to_line(line, patient, illness_severity):
                                 cutting_point = patient_index + 1
                                 passed_line = passed_line[0:cutting_point] + [patient_to_be_appended] + passed_line[cutting_point:]
                                 break
+                    else:
+                        # if we arrived earlier then this patient, add us before him
+                        cutting_point = patient_index
+                        passed_line = passed_line[0:cutting_point] + [patient_to_be_appended] + passed_line[
+                                                                                                cutting_point:]
+                        break
     return passed_line
 
 
