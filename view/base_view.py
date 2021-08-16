@@ -51,12 +51,12 @@ class BaseView(ABC):
         print("-------- Hospital Mendes ---------")
         print(self.format_menu_name_to_fit_hospital_header(menu_name))
 
-    def ask_for_cpf(self, current_menu_name: str):
+    @staticmethod
+    def ask_for_cpf():
         """
         Asks for CPF
         :return: given cpf
         """
-        self.display_header(current_menu_name)
         return input('CPF (apenas números): ')
 
     @staticmethod

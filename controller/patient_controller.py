@@ -71,8 +71,8 @@ class PatientController(BaseController):
             patient.add_illness(created_illness)
 
     def admit_patient(self):
-        menu_name = 'Admitir paciente'
-        cpf = self.__view.ask_for_cpf(menu_name)
+        self.__view.display_header('Admitir paciente')
+        cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf)
         if patient is None:
             new_patient = self.ask_for_patient_info_and_create_patient(cpf)
@@ -148,8 +148,8 @@ class PatientController(BaseController):
                                     break
 
     def discharge_patient(self):
-        menu_name = 'Dar alta para um paciente'
-        cpf = self.__view.ask_for_cpf(menu_name)
+        self.__view.display_header('Dar alta para um paciente')
+        cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
         if patient is not None:
             self.__view.display_person_info(patient)
@@ -158,8 +158,8 @@ class PatientController(BaseController):
                 self.__view.display_msg(f'[+] {patient.name} recebeu alta!')
 
     def get_patient_history_and_data(self):
-        menu_name = 'Ver dados/histórico de um paciente'
-        cpf = self.__view.ask_for_cpf(menu_name)
+        self.__view.display_header('Ver dados/histórico de um paciente')
+        cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
         if patient is not None:
             previous_admittions = [patient for patient in self.__patients if patient.cpf == cpf]
@@ -170,8 +170,8 @@ class PatientController(BaseController):
         Deletes patient by cpf
         :return:
         """
-        menu_name = "Excluir paciente"
-        cpf = self.__view.ask_for_cpf(menu_name)
+        self.__view.display_header("Excluir paciente")
+        cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True)
         if patient is not None:
             self.__view.display_person_info(patient, only_base_info=True)
@@ -184,8 +184,8 @@ class PatientController(BaseController):
         self.__view.show_waiting_line(self.__patients_line)
 
     def update_health_status(self):
-        menu_name = 'Atualizar estado de saúde de um paciente'
-        cpf = self.__view.ask_for_cpf(menu_name)
+        self.__view.display_header('Atualizar estado de saúde de um paciente')
+        cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
         if patient is not None:
             possible_status = ['Saudável', 'Estável', 'Crítico', 'Morto']

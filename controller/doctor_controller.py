@@ -26,7 +26,8 @@ class DoctorController(BaseController):
             return doctors_found[0]
 
     def register_doctor(self):
-        cpf = self.__view.ask_for_cpf('Cadastrar médico')
+        self.__view.display_header('Cadastrar médico')
+        cpf = self.__view.ask_for_cpf()
         if not self.find_doctor_by_cpf(cpf, display_not_found_msg=False):
             name, phone, birth, salary = self.__view.display_register_doctor()
             Doctor(name, phone, cpf, birth, salary, on_call=False)
@@ -34,7 +35,8 @@ class DoctorController(BaseController):
             self.__view.display_msg('[!] Já existe um médico com esse CPF.')
 
     def edit_doctor(self):
-        cpf = self.__view.ask_for_cpf('Alterar médico')
+        self.__view.display_header('Alterar médico')
+        cpf = self.__view.ask_for_cpf()
         doc = self.find_doctor_by_cpf(cpf)
         if doc is not None:
             cpf, name, phone, birth, salary, on_call = self.__view.display_edit_doctor(doc)
@@ -53,7 +55,8 @@ class DoctorController(BaseController):
             self.__view.display_msg('[+] Dados do médico alterados com sucesso!')
 
     def get_doctor(self):
-        cpf = self.__view.ask_for_cpf('Buscar médico')
+        self.__view.display_header('Buscar médico')
+        cpf = self.__view.ask_for_cpf()
         doc = self.find_doctor_by_cpf(cpf)
         if doc is not None:
             self.__view.display_person_info(doc)
@@ -63,7 +66,8 @@ class DoctorController(BaseController):
         Deletes doctor by cpf
         :return:
         """
-        cpf = self.__view.ask_for_cpf("Excluir médico")
+        self.__view.display_header("Excluir médico")
+        cpf = self.__view.ask_for_cpf()
         doc = self.find_doctor_by_cpf(cpf)
         if doc is not None:
             self.__view.display_person_info(doc)
