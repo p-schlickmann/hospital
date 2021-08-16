@@ -96,19 +96,36 @@ class PatientView(BaseView):
         return symptoms
 
     def display_patient_condition(self, patient, admittion_count):
+        print('-----------------')
         print(f'{admittion_count} vez no hospital.')
-        print('Doenças: ')
-        for illness in patient.illnesses:
-            print(f'- {illness}')
-        print('Sintomas: ')
-        for symptom in patient.symptoms:
-            print(f'- {symptom}')
+        arrived_at = patient.arrived_at
+        if arrived_at:
+            print(f'Chegou: {arrived_at}')
+        admitted_at = patient.admitted_at
+        if admitted_at:
+            print(f'Admitido em: {admitted_at}')
+        doctors = patient.doctors
+        if doctors:
+            print(f'Médicos: ')
+            for doc in doctors:
+                print(f'- {doc}')
+        discharged_at = patient.discharged_at
+        if discharged_at:
+            print(f'Alta: {discharged_at}')
+        if patient.illnesses:
+            print('Doenças: ')
+            for illness in patient.illnesses:
+                print(f'- {illness}')
+        if patient.symptoms:
+            print('Sintomas: ')
+            for symptom in patient.symptoms:
+                print(f'- {symptom}')
 
     def display_patient_history(self, previous_admittions):
         if not previous_admittions:
             print('[-] Esse paciente não tem histórico de internação no nosso hospital')
         else:
-            self.display_person_info(previous_admittions[0])
+            self.display_person_info(previous_admittions[0], only_base_info=True)
             for idx, patient in enumerate(previous_admittions):
                 self.display_patient_condition(patient, idx + 1)
 

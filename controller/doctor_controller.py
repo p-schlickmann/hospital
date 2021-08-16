@@ -29,7 +29,7 @@ class DoctorController(BaseController):
         self.__view.display_header('Cadastrar médico')
         cpf = self.__view.ask_for_cpf()
         if not self.find_doctor_by_cpf(cpf, display_not_found_msg=False):
-            name, phone, birth, salary = self.__view.display_register_doctor()
+            name, phone, birth, salary= self.__view.display_register_doctor()
             doctor = Doctor(name, phone, cpf, birth, salary, on_call=False, available=True)
             self.__doctors.append(doctor)
             self.__view.display_msg('[+] Médico cadastado com sucesso!')
@@ -41,7 +41,7 @@ class DoctorController(BaseController):
         cpf = self.__view.ask_for_cpf()
         doc = self.find_doctor_by_cpf(cpf)
         if doc is not None:
-            cpf, name, phone, birth, salary, on_call = self.__view.display_edit_doctor(doc)
+            cpf, name, phone, birth, salary, available, on_call = self.__view.display_edit_doctor(doc)
             if cpf:
                 doc.cpf = cpf
             if name:
@@ -52,6 +52,8 @@ class DoctorController(BaseController):
                 doc.date_of_birth = birth
             if salary:
                 doc.salary = salary
+            if available:
+                doc.available = True if available in {'sim', 's', 'S', 'Sim'} else False
             if on_call:
                 doc.on_call = True if on_call in {'sim', 's', 'S', 'Sim'} else False
             self.__view.display_msg('[+] Dados do médico alterados com sucesso!')

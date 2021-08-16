@@ -129,6 +129,10 @@ class PatientController(BaseController):
         if patient is not None:
             self.__view.display_person_info(patient)
             if self.__view.confirm_action('Dar alta para o paciente encontrado?'):
+                patient_to_discharge_cpf = patient.cpf
+                self.__patients_line = [
+                    patient for patient in self.__patients_line if patient['patient'].cpf == patient_to_discharge_cpf
+                ]
                 patient.discharged_at = datetime.now()
                 self.__view.display_msg(f'[+] {patient.name} recebeu alta!')
 

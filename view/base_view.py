@@ -92,6 +92,7 @@ class BaseView(ABC):
         print(f'Celular: {person.phone_number}')
         if isinstance(person, Doctor):
             print(f'Salário: {person.salary}')
+            print(f'Disponível: {"sim" if person.available else "nao"}')
             print(f'De plantão: {"sim" if person.on_call else "nao"}')
         elif isinstance(person, Patient):
             if not only_base_info:

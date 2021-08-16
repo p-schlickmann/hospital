@@ -33,8 +33,9 @@ class DoctorView(BaseView):
         phone = input(f'Celular [{doctor.phone_number}]: ')
         birth = input(f'Data de nascimento [{doctor.date_of_birth}]: ')
         salary = input(f'Salário [{doctor.salary}]: ')
+        available = input(f'Disponível [{"sim" if doctor.available else "nao"}](s/N): ')
         on_call = input(f'De plantão [{"sim" if doctor.on_call else "nao"}](s/N): ')
-        return cpf, name, phone, birth, salary, on_call
+        return cpf, name, phone, birth, salary, available, on_call
 
     def list_on_call_doctors(self, doctors):
         if not doctors:
