@@ -2,10 +2,11 @@ from model.person import Person
 from doctor import Doctor
 from illness import Illness
 from synptom import Symptoms
+from health_status import health_status
 
 
 class Patient(Person):
-    def __init__(self, name: str, phone_number: int, cpf: int, date_of_birth: datetime, emergency_contact: int, arrived_at: datetime, admitted_at: datetime, discharged_at: datetime):
+    def __init__(self, name: str, phone_number: int, cpf: int, date_of_birth: datetime, emergency_contact: int, arrived_at: datetime, admitted_at: datetime, discharged_at: datetime, health_status: Health_status):
         self.__name = name
         self.__phone_number = phone_number
         self.__cpf = cpf
@@ -38,7 +39,7 @@ class Patient(Person):
         return self.__admitted_at
     
     @admitted_at.setter
-    def admitted_at(self, admitted_at: int):
+    def admitted_at(self, admitted_at: datetime):
         self.__admitted_at = admitted_at
         
     @property
@@ -46,8 +47,16 @@ class Patient(Person):
         return self.__discharged_at
     
     @discharged_at.setter
-    def discharged_at(self):
+    def discharged_at(self, discharged_at: datetime):
         self.__discharged_at = discharged_at
+        
+    @property
+    def health_status(self):
+        return self.__health_status
+    
+    @health_status.setter
+    def health_status(self, health_status: Health_status):
+        self.__health_status = health_status
         
     def add_doctor(self, doctor: Doctor):
         if (doctor is not None) and (isinstance(doctor, Doctor)):
