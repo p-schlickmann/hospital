@@ -1,3 +1,4 @@
+from model.health_status import POSSIBLE_STATUS
 from .base_view import BaseView
 
 
@@ -22,28 +23,30 @@ class PatientView(BaseView):
         chosen_option = input("Digite o número da opção desejada: ")
         return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6, 7})
 
-    @staticmethod
-    def show_waiting_line(line: list):
+    def show_waiting_line(self, line: list):
         """
         Display patient waiting line on the screen
         :param line: list of patients in the line
         :return: None
         """
+        if not line:
+            self.display_msg('[-] A fila de pacientes está vazia.')
         for i, patient in enumerate(line):
-            print(f'{i + 1}. {patient}')
+            print(f'{i + 1}. {patient["patient"].name} | gravidade: {patient["severity"]}')
 
-    def update_health_status(self, possible_status, patient):
+    def get_health_status(self, patient):
         """
-        Displays input to get new pacient health status
-        :param possible_status: list of possible health status a patient can have
+        Displays input to get new patient health status
         :param patient: Patient instance
-        :return: new health status
+        :return: new health status, None if chosen status is invalid
         """
-        print('Selecione o novo estado de saúde do paciente encontrado')
-        for status in possible_status:
-            print(f'[1] {status} {"(atual)" if status == patient.health_status.status else ""}')
-        possible_indexes = {idx for idx, status in enumerate(possible_status)}
-        return self.read_whole_number(input('Digite o número do status desejado: '), possible_indexes) - 1
+        print('Selecione um estado de saúde para o paciente')
+        for idx, status in enumerate(POSSIBLE_STATUS):
+            print(f'[{idx + 1}] {status} {"(atual)" if status == patient.health_status else ""}')
+        possible_indexes = {idx for idx, status in enumerate(POSSIBLE_STATUS)}
+        chosen_status = self.read_whole_number(input('Digite o número do status desejado: '), possible_indexes)
+        if chosen_status:
+            return POSSIBLE_STATUS[chosen_status - 1]
 
     @staticmethod
     def ask_for_emergency_contact():
@@ -92,10 +95,10 @@ class PatientView(BaseView):
                 break
         return symptoms
 
-    def display_patient_condition(self, patient):
-        print('1 vez no hospital.')
+    def display_patient_condition(self, patient, admittion_count):
+        print(f'{admittion_count} vez no hospital.')
         print('Doenças: ')
-        for illness in patient.ilnesses:
+        for illness in patient.illnesses:
             print(f'- {illness}')
         print('Sintomas: ')
         for symptom in patient.symptoms:
@@ -106,5 +109,15 @@ class PatientView(BaseView):
             print('[-] Esse paciente não tem histórico de internação no nosso hospital')
         else:
             self.display_person_info(previous_admittions[0])
-            for patient in previous_admittions:
-                self.display_patient_condition(patient)
+            for idx, patient in enumerate(previous_admittions):
+                self.display_patient_condition(patient, idx + 1)
+
+    def get_doctors_that_diagnosed_the_patient(self):
+        print('Digite o CPF de um dos médicos que atendeu esse paciente: ')
+        cpfs = []
+        add_another = True
+        while add_another:
+            cpf = input('CPF: ')
+            cpfs.append(cpf)
+            add_another = self.confirm_action('Adicionar outro médico?')
+        return cpfs

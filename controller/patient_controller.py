@@ -29,9 +29,10 @@ class PatientController(BaseController):
             patients_found = [
                 patient for patient in self.__patients if patient.cpf == cpf
             ]
-        if not patients_found and display_not_found_msg:
-            self.__view.display_msg(f'[-] Nenhum paciente foi encontrado com esse CPF ({cpf}).')
-            self.__view.display_msg('[!] Verifique se o cpf é valido e foi digitado apenas com números.')
+        if not patients_found:
+            if display_not_found_msg:
+                self.__view.display_msg(f'[-] Nenhum paciente foi encontrado com esse CPF ({cpf}).')
+                self.__view.display_msg('[!] Verifique se o cpf é valido e foi digitado apenas com números.')
         else:
             return patients_found[0]
 
@@ -64,11 +65,21 @@ class PatientController(BaseController):
         except IndexError:
             self.__view.display_msg('[-] Nenhum paciente na fila!')
             return
+        self.__view.display_msg(f'Atendendo o paciente {patient}')
         for symptom in self.__view.enter_symptoms():
             patient.add_symptom(symptom['name'], symptom['description'], symptom['discomfort_level'])
         for illness in self.__view.enter_illnesses():
             created_illness = Illness(illness['name'], illness['description'], illness['severity'])
             patient.add_illness(created_illness)
+        patient.health_status = self.__view.get_health_status(patient)
+        patient_cpf = patient.cpf
+        self.__patients_line = [patient for patient in self.__patients_line if patient['patient'].cpf != patient_cpf]
+        cpfs = self.__view.get_doctors_that_diagnosed_the_patient()
+        for cpf in cpfs:
+            if cpf:
+                doc = self.__system_controller.doc_controller.find_doctor_by_cpf(cpf, display_not_found_msg=False)
+                if doc:
+                    patient.add_doctor(doc)
 
     def admit_patient(self):
         self.__view.display_header('Admitir paciente')
@@ -77,6 +88,9 @@ class PatientController(BaseController):
         if patient is None:
             new_patient = self.ask_for_patient_info_and_create_patient(cpf)
         else:
+            if not patient.discharged_at:
+                self.__view.display_msg('[!] Esse paciente já foi admitido! ')
+                return
             self.__view.display_msg('[+] Encontramos um cadastro previamente preenchido para esse paciente:')
             self.__view.display_person_info(patient, only_base_info=True)
             use_this_registry = self.__view.use_this_registry()
@@ -84,12 +98,14 @@ class PatientController(BaseController):
                 arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
                 new_patient = Patient(
                     patient.name, patient.phone_number, patient.cpf,
-                    patient.date_of_birth, patient.emergency_contact, arrived_at, admitted_at
+                    patient.date_of_birth, patient.emergency_contact,
+                    arrived_at, admitted_at
                 )
             else:
                 new_patient = self.ask_for_patient_info_and_create_patient(patient.cpf)
         self.__patients.append(new_patient)
         self.add_patient_to_line(new_patient, randint(0, 5))
+        self.__view.display_msg('[+] Paciente admitido com sucesso!')
 
     def add_patient_to_line(self, patient, illness_severity):
         """
@@ -181,6 +197,7 @@ class PatientController(BaseController):
                 self.__view.display_msg('[+] Dados e histórico do paciente excluídos com sucesso!')
 
     def get_patient_line(self):
+        self.__view.display_header('Ver fila de atendimento')
         self.__view.show_waiting_line(self.__patients_line)
 
     def update_health_status(self):
@@ -188,7 +205,7 @@ class PatientController(BaseController):
         cpf = self.__view.ask_for_cpf()
         patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
         if patient is not None:
-            possible_status = ['Saudável', 'Estável', 'Crítico', 'Morto']
-            status_idx = self.__view.update_health_status(possible_status, patient)
-            patient.health_status.status = possible_status[status_idx]
-            self.__view.display_msg('[+] Estado de saúde do paciente atualizado com sucesso!')
+            new_status = self.__view.get_health_status(patient)
+            if new_status:
+                patient.health_status = new_status
+                self.__view.display_msg('[+] Estado de saúde do paciente atualizado com sucesso!')

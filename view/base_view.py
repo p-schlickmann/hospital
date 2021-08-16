@@ -60,13 +60,17 @@ class BaseView(ABC):
         """
         return input('CPF (apenas números): ')
 
-    @staticmethod
-    def ask_for_main_info():
+    def ask_for_main_info(self):
         """
         Display main info inputs
         :return: tuple containing info gathered from the inputs
         """
-        name = input('Nome completo: ')
+        while True:
+            name = input('Nome completo: ')
+            if not name:
+                self.display_msg('[!] O nome é obrigatório!')
+                continue
+            break
         phone_number = input('Telefone com DDD (apenas números): ')
         date_of_birth = input('Data de nascimento (DD/MM/AAAA): ')
         return name, phone_number, date_of_birth
@@ -82,7 +86,7 @@ class BaseView(ABC):
         :param person: patient or doctor instance
         :return: None
         """
-        print(f'---- {person.name} ----')
+        print(f'Nome: {person.name}')
         print(f'Data de nascimento: {person.date_of_birth}')
         print(f'CPF: {person.cpf}')
         print(f'Celular: {person.phone_number}')
@@ -99,12 +103,13 @@ class BaseView(ABC):
                     print(f'Admitido em: {admitted_at}')
                 doctors = person.doctors
                 if doctors:
-                    print(f'Médicos: {doctors}')
+                    print(f'Médicos: ')
+                    for doc in doctors:
+                        print(f'- {doc}')
                 discharged_at = person.discharged_at
                 if discharged_at:
                     print(f'Alta: {discharged_at}')
             print(f'Contato de emergência: {person.emergency_contact}')
-        print(f'---- {person.name} ----')
 
     @staticmethod
     def confirm_action(msg):

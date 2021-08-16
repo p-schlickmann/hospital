@@ -4,6 +4,9 @@ class Illness:
         self.__description = description
         self.__severity = severity
         self.__cured = cured
+
+    def __str__(self):
+        return f'{self.name} | {self.description} | Gravidade: {self.severity}'
         
     @property
     def name(self):

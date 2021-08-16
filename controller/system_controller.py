@@ -14,6 +14,10 @@ class SystemController(BaseController):
         self.__view = SystemView()
         super().__init__(self.__view)
 
+    @property
+    def doc_controller(self):
+        return self.__doctor_controller
+
     @staticmethod
     def exit():
         exit(0)

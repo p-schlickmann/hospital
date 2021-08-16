@@ -1,9 +1,11 @@
 class Symptom:
-    def __init__(self, name: str, description: str, discomfort_level: int, id: int):
+    def __init__(self, name: str, description: str, discomfort_level: int):
         self.__name = name
         self.__description = description
         self.__discomfort_level = discomfort_level
-        self.__id = id
+
+    def __str__(self):
+        return f'{self.name} | {self.description} | Desconforto: {self.discomfort_level}'
         
     @property
     def name(self):
