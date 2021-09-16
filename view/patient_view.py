@@ -23,6 +23,12 @@ class PatientView(BaseView):
         chosen_option = input("Digite o número da opção desejada: ")
         return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6, 7})
 
+    def open(self):
+        pass
+
+    def close(self):
+        pass
+
     def show_waiting_line(self, line: list):
         """
         Display patient waiting line on the screen

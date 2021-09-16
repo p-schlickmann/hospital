@@ -9,7 +9,7 @@ class Log:
         self.__happened_at = happened_at
 
     def __str__(self):
-        return f'{self.id} | {self.title} | {self.happened_at}'
+        return f'{self.id} | {self.title} | {self.happened_at.strftime("%d/%m/%Y %H:%M")}'
         
     @property
     def id(self):

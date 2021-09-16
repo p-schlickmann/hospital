@@ -7,12 +7,19 @@ from controller.log_controller import LogController
 
 class SystemController(BaseController):
 
+    __instance = None
+
     def __init__(self):
         self.__doctor_controller = DoctorController(self)
         self.__patient_controller = PatientController(self)
         self.__log_controller = LogController(self)
         self.__view = SystemView()
         super().__init__(self.__view)
+
+    def __new__(cls, *args, **kwargs):
+        if SystemController.__instance is None:
+            SystemController.__instance = object.__new__(cls)
+        return SystemController.__instance
 
     @property
     def doc_controller(self):
@@ -21,6 +28,9 @@ class SystemController(BaseController):
     @staticmethod
     def exit():
         exit(0)
+
+    def start_system(self):
+        self.open_main_view()
 
     def open_patient_view(self):
         options = {
@@ -57,9 +67,6 @@ class SystemController(BaseController):
         }
         self.__log_controller.open_view(options)
 
-    def start_system(self):
-        self.open_main_view()
-
     def open_main_view(self):
         options = {
             0: self.exit,
@@ -68,5 +75,6 @@ class SystemController(BaseController):
             3: self.open_log_view,
         }
         self.open_view(options)
+
 
 

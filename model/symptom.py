@@ -30,11 +30,3 @@ class Symptom:
     @discomfort_level.setter
     def discomfort_level(self, discomfort_level: int):
         self.__discomfort_level = discomfort_level
-        
-    @property
-    def id(self):
-        return self.__id
-    
-    @id.setter
-    def id(self, id: int):
-        self.__id = id

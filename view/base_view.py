@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+import PySimpleGUI as sg
+
 from model.doctor import Doctor
 from model.patient import Patient
 
@@ -10,7 +12,11 @@ class BaseView(ABC):
         pass
 
     @abstractmethod
-    def display_options(self):
+    def open(self):
+        pass
+
+    @abstractmethod
+    def close(self):
         pass
 
     @staticmethod
@@ -76,8 +82,8 @@ class BaseView(ABC):
         return name, phone_number, date_of_birth
 
     @staticmethod
-    def display_msg(msg: str):
-        print(msg)
+    def display_msg(msg: str, success):
+        sg.Popup('Sucesso' if success else 'Erro', msg, font=('Helvetica', 15))
 
     @staticmethod
     def display_person_info(person, only_base_info=False):
@@ -115,3 +121,7 @@ class BaseView(ABC):
     @staticmethod
     def confirm_action(msg):
         return input(f'[?] {msg}? [s/N]: ') in {'s', 'S'}
+
+    @staticmethod
+    def blue_button(name, key):
+        return sg.Button(name, key=key, size=(15, 1.3), font=('Helvetica', 15))

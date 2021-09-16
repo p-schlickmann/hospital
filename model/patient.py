@@ -15,7 +15,6 @@ class Patient(Person):
         self.__admitted_at = admitted_at
         self.__health_status = ''
         self.__discharged_at = None
-        self.__diagnosed = False
         self.__doctors = []
         self.__illnesses = []
         self.__symptoms = []
@@ -93,9 +92,6 @@ class Patient(Person):
     def symptoms(self):
         return self.__symptoms
 
-    def symptom_id_available(self, symptom_id):
-        return not [symptom for symptom in self.__symptoms if symptom.id == symptom_id]
-
     def add_symptom(self, name, description, discomfort_level):
         """
         Adds symptom to symptoms list
@@ -104,7 +100,3 @@ class Patient(Person):
         symptom = Symptom(name, description, discomfort_level)
         self.__symptoms.append(symptom)
         return symptom
-
-    @property
-    def diagnosed(self):
-        return self.__diagnosed

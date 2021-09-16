@@ -21,6 +21,12 @@ class DoctorView(BaseView):
         chosen_option = input("Digite o número da opção desejada: ")
         return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6})
 
+    def open(self):
+        pass
+
+    def close(self):
+        pass
+
     def display_register_doctor(self):
         name, phone, birth = self.ask_for_main_info()
         salary = self.read_whole_number(input('Salário anual (apenas números): '))

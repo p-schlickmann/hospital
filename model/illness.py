@@ -1,9 +1,8 @@
 class Illness:
-    def __init__(self, name: str, description: str, severity: int, cured=False):
+    def __init__(self, name: str, description: str, severity: int):
         self.__name = name
         self.__description = description
         self.__severity = severity
-        self.__cured = cured
 
     def __str__(self):
         return f'{self.name} | {self.description} | Gravidade: {self.severity}'
@@ -31,11 +30,3 @@ class Illness:
     @severity.setter
     def severity(self, severity: int):
         self.__severity = severity
-        
-    @property
-    def cured(self):
-        return self.__cured
-    
-    @cured.setter
-    def cured(self, cured: bool):
-        self.__cured = cured
