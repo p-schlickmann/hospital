@@ -1,67 +1,113 @@
+import PySimpleGUI as sg
+
 from .base_view import BaseView
 
 
 class DoctorView(BaseView):
     def __init__(self):
         super().__init__()
+        self.__window = None
 
-    def display_options(self):
-        """
-        Displays system options
-        :return: chosen option
-        """
-        self.display_header('Médicos')
-        print("1 - Cadastrar médico")
-        print("2 - Alterar médico")
-        print("3 - Buscar médico")
-        print("4 - Excluir médico")
-        print("5 - Listar médicos de plantão")
-        print("6 - Chamar médico")
-        print("0 - Voltar ao menu principal")
-        chosen_option = input("Digite o número da opção desejada: ")
-        return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6})
+    def init_components(self):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Médicos', element_justification='c').Layout([
+            [sg.Text('Médicos', font=('Helvetica', 25))],
+            [
+                self.blue_button('Listar', 4),
+                self.blue_button('Criar', 1)
+            ],
+            [
+                self.blue_button('Editar', 2),
+                self.blue_button('Deletar', 3)
+            ],
+            [self.blue_button('Menu principal', 0)]
+        ])
+        self.__window = window
 
     def open(self):
-        pass
+        button, values = self.__window.Read()
+        return button, values
 
     def close(self):
-        pass
+        self.__window.Close()
 
-    def display_register_doctor(self):
-        name, phone, birth = self.ask_for_main_info()
-        salary = self.read_whole_number(input('Salário anual (apenas números): '))
-        return name, phone, birth, salary
+    def new_doctor(self):
+        input_font = ('Helvetica', 15)
+        input_size = (10, 2)
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Médicos - Criar', element_justification='c').Layout([
+            [sg.Text('Criar médico', font=('Helvetica', 25))],
+            [sg.Text('Id', font=input_font, size=input_size), sg.InputText(key='id', font=input_font)],
+            [sg.Text('Título', font=input_font, size=input_size), sg.InputText(key='title', font=input_font)],
+            [sg.Text('Descrição', font=input_font, size=input_size), sg.InputText(key='desc', font=input_font)],
+            [self.blue_button('Cancelar', 0), self.blue_button('Criar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['id'], values['title'], values['desc']
 
-    def display_edit_doctor(self, doctor):
-        print('[+] Pressione `Enter` para pular.')
-        name = input(f'Nome [{doctor.name}]: ')
-        cpf = input(f'CPF [{doctor.cpf}]: ')
-        phone = input(f'Celular [{doctor.phone_number}]: ')
-        birth = input(f'Data de nascimento [{doctor.date_of_birth}]: ')
-        salary = input(f'Salário [{doctor.salary}]: ')
-        available = input(f'Disponível [{"sim" if doctor.available else "nao"}](s/N): ')
-        on_call = input(f'De plantão [{"sim" if doctor.on_call else "nao"}](s/N): ')
-        return cpf, name, phone, birth, salary, available, on_call
+    def ask_for_doctor_id(self):
+        sg.ChangeLookAndFeel('Reddit')
+        input_font = ('Helvetica', 15)
+        input_size = (10, 2)
+        window = sg.Window('Hospital Mendes - Médicos', element_justification='c').Layout([
+            [sg.Text('Digite o id do médico', font=('Helvetica', 25))],
+            [sg.Text('Id', font=input_font, size=input_size), sg.InputText(key='id', font=input_font)],
+            [self.blue_button('Voltar', 0), self.blue_button('Ok', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['id']
 
-    def list_on_call_doctors(self, doctors):
-        if not doctors:
-            self.display_msg('[!] Nenhum médico está de plantão!')
-        for doctor in doctors:
-            print(doctor)
+    def edit_doctor(self, doctor):
+        input_font = ('Helvetica', 15)
+        input_size = (10, 2)
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Médicos - Editar', element_justification='c').Layout([
+            [sg.Text(f'Editar id do médico {doctor.id}', font=('Helvetica', 25))],
+            [
+                sg.Text('Título', font=input_font, size=input_size),
+                sg.InputText(key='title', font=input_font, default_text=doctor.title)
+            ],
+            [
+                sg.Text('Descrição', font=input_font, size=input_size),
+                sg.InputText(key='desc', font=input_font, default_text=doctor.description)
+            ],
+            [self.blue_button('Cancelar', 0), self.blue_button('Confirmar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['title'], values['desc']
 
-    def list_available_doctors_to_call(self, on_call_doctors, doctors):
-        """
-        Lists available doctors to call and lets the user choose one
-        :param on_call_doctors: List of on call doctors
-        :param doctors: List of available doctors, but not on call
-        :return: chosen doctor
-        """
-        joined_doctors = list(set(on_call_doctors + doctors))
-        for i, doctor in enumerate(joined_doctors):
-            print(f'[{i + 1}] {doctor.name}', ' - PLANTÃO' if doctor in on_call_doctors else '')
-        chosen_doctor = input('Digite o número do lado do nome do médico que você deseja chamar: ')
-        possible_doctors_indexes = {idx + 1 for idx, doc in enumerate(joined_doctors)}
-        chosen_doctor_index = self.read_whole_number(chosen_doctor, possible_doctors_indexes)
-        if chosen_doctor_index:
-            return joined_doctors[chosen_doctor_index - 1]
+    def list_doctors(self, doctors: list):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Médicos - Listar', element_justification='c').Layout([
+            [sg.Text('Listar médicos', font=('Helvetica', 25))],
+            [[sg.Text(doctor, font=('Helvetica', 20))] for doctors in doctors],
+            [self.blue_button('Voltar', 0)]
+        ])
+        self.__window = window
+        self.open()
+        self.close()
+
+    def confirm_doctor_deletion(self, doctor):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Médico - Excluir', element_justification='c').Layout([
+            [sg.Text('Excluir médico encontrado?', font=('Helvetica', 25))],
+            [sg.Text(médico, font=('Helvetica', 20))],
+            [self.blue_button('Voltar', 0), self.blue_button('Confirmar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        return int(button) == 1
 
