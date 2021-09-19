@@ -104,6 +104,7 @@ class LogView(BaseView):
         sg.ChangeLookAndFeel('Reddit')
         window = sg.Window('Hospital Mendes - Logs - Listar', element_justification='c').Layout([
             [sg.Text('Listar logs', font=('Helvetica', 25))],
+            [[sg.Text('O hospital ainda não tem logs :(', font=('Helvetica', 20))] for _ in range(1) if not logs],
             [[sg.Text(log, font=('Helvetica', 20))] for log in logs],
             [self.blue_button('Voltar', 0)]
         ])

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from random import randint
 
 from controller.base_controller import BaseController
+from data.data_access_object import DataAccessObject
 from model.illness import Illness
 from model.patient import Patient
 from view.patient_view import PatientView
@@ -13,6 +14,7 @@ class PatientController(BaseController):
         self.__patients_line = []
         self.__system_controller = system_controller
         self.__view = PatientView()
+        self.__dao = DataAccessObject('patients.pkl', Patient)
         super().__init__(self.__view, self.__system_controller)
 
     def find_patient_by_cpf(self, cpf, display_not_found_msg=False, not_discharged=False):
@@ -20,21 +22,16 @@ class PatientController(BaseController):
         Searches for patient with the given cpf
         :return: Patient if found, otherwise None
         """
-        if not_discharged:
-            patients_found = [
-                patient for patient in self.__patients
-                if patient.cpf == cpf and not patient.discharged_at
-            ]
-        else:
-            patients_found = [
-                patient for patient in self.__patients if patient.cpf == cpf
-            ]
-        if not patients_found:
+        patient = self.__dao.get(cpf)
+        if not_discharged and not patient.discharged_at:
+            return
+        if not patient:
             if display_not_found_msg:
-                self.__view.display_msg(f'[-] Nenhum paciente foi encontrado com esse CPF ({cpf}).')
-                self.__view.display_msg('[!] Verifique se o cpf é valido e foi digitado apenas com números.')
+                self.__view.display_msg(f'Nenhum paciente foi encontrado com esse CPF ({cpf}).\n'
+                                        f'Verifique se o cpf é valido e foi digitado apenas com números.',
+                                        success=False)
         else:
-            return patients_found[0]
+            return patient
 
     @staticmethod
     def get_arrival_and_admittion_datetime():
@@ -52,10 +49,12 @@ class PatientController(BaseController):
         :param cpf: person cpf
         :return: created patient
         """
-        name, phone, birth = self.__view.ask_for_main_info()
-        emergency_contact = self.__view.ask_for_emergency_contact()
-        arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
-        return Patient(name, phone, cpf, birth, emergency_contact, arrived_at, admitted_at)
+        info = self.__view.ask_for_main_info()
+        if info:
+            name, phone, emergency_contact, birth = info
+            arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
+            return Patient(name, phone, cpf, birth, emergency_contact, arrived_at, admitted_at)
+
 
     def diagnose(self):
         menu_name = 'Atender paciente da fila'
@@ -82,30 +81,32 @@ class PatientController(BaseController):
                     patient.add_doctor(doc)
 
     def admit_patient(self):
-        self.__view.display_header('Admitir paciente')
         cpf = self.__view.ask_for_cpf()
-        patient = self.find_patient_by_cpf(cpf)
-        if patient is None:
-            new_patient = self.ask_for_patient_info_and_create_patient(cpf)
-        else:
-            if not patient.discharged_at:
-                self.__view.display_msg('[!] Esse paciente já foi admitido! ')
-                return
-            self.__view.display_msg('[+] Encontramos um cadastro previamente preenchido para esse paciente:')
-            self.__view.display_person_info(patient, only_base_info=True)
-            use_this_registry = self.__view.use_this_registry()
-            if use_this_registry:
-                arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
-                new_patient = Patient(
-                    patient.name, patient.phone_number, patient.cpf,
-                    patient.date_of_birth, patient.emergency_contact,
-                    arrived_at, admitted_at
-                )
+        if cpf:
+            patient = self.find_patient_by_cpf(cpf)
+            if patient is None:
+                new_patient = self.ask_for_patient_info_and_create_patient(cpf)
             else:
-                new_patient = self.ask_for_patient_info_and_create_patient(patient.cpf)
-        self.__patients.append(new_patient)
-        self.add_patient_to_line(new_patient, randint(0, 5))
-        self.__view.display_msg('[+] Paciente admitido com sucesso!')
+                if not patient.discharged_at:
+                    self.__view.display_msg('[!] Esse paciente já foi admitido! ')
+                    return
+                self.__view.display_msg('[+] Encontramos um cadastro previamente preenchido para esse paciente:')
+                self.__view.display_person_info(patient, only_base_info=True)
+                use_this_registry = self.__view.use_this_registry()
+                if use_this_registry:
+                    arrived_at, admitted_at = self.get_arrival_and_admittion_datetime()
+                    new_patient = Patient(
+                        patient.name, patient.phone_number, patient.cpf,
+                        patient.date_of_birth, patient.emergency_contact,
+                        arrived_at, admitted_at
+                    )
+                else:
+                    new_patient = self.ask_for_patient_info_and_create_patient(patient.cpf)
+            if new_patient:
+                self.__patients.append(new_patient)
+                self.add_patient_to_line(new_patient, randint(0, 5))
+                self.__view.display_msg('Paciente admitido com sucesso!', success=True)
+        self.__system_controller.open_patient_view()
 
     def add_patient_to_line(self, patient, illness_severity):
         """
@@ -161,7 +162,6 @@ class PatientController(BaseController):
                 self.__view.display_msg('[+] Dados e histórico do paciente excluídos com sucesso!')
 
     def get_patient_line(self):
-        self.__view.display_header('Ver fila de atendimento')
         self.__view.show_waiting_line(self.__patients_line)
 
     def update_health_status(self):

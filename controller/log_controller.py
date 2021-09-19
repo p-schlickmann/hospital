@@ -1,15 +1,16 @@
 from datetime import datetime
 
 from controller.base_controller import BaseController
+from data.data_access_object import DataAccessObject
 from model.log import Log
 from view.log_view import LogView
 
 
 class LogController(BaseController):
     def __init__(self, system_controller):
-        self.__logs = []
         self.__system_controller = system_controller
         self.__view = LogView()
+        self.__dao = DataAccessObject('data/logs.pkl', Log)
         super().__init__(self.__view, self.__system_controller)
 
     def new_log(self):
@@ -20,14 +21,14 @@ class LogController(BaseController):
                 self.__view.display_msg('Especifique pelo menos um titulo e um id!', success=False)
             else:
                 log = Log(id, title, desc, datetime.now())
-                self.__logs.append(log)
+                self.__dao.add(log.id, log)
                 self.__view.display_msg('Log criado com sucesso!', success=True)
         self.__system_controller.open_log_view()
 
     def find_log_by_id(self, id):
-        logs_found = [log for log in self.__logs if log.id == id]
-        if logs_found:
-            return logs_found[0]
+        log = self.__dao.get(id)
+        if log:
+            return log
         else:
             self.__view.display_msg(f'Nenhum log encontrado com esse id! ({id})', success=False)
 
@@ -43,6 +44,7 @@ class LogController(BaseController):
                         log.title = title
                     if desc:
                         log.description = desc
+                    self.__dao.add(log.id, log)
                     self.__view.display_msg('Log editado com sucesso!', success=True)
         self.__system_controller.open_log_view()
 
@@ -57,13 +59,11 @@ class LogController(BaseController):
             if log_to_remove is not None:
                 confirmed = self.__view.confirm_log_deletion(log_to_remove)
                 if confirmed:
-                    self.__logs = [log for log in self.__logs if log.id != log_to_remove.id]
+                    self.__dao.remove(log_to_remove.id)
                     self.__view.display_msg('Log excluído com sucesso!', success=True)
         self.__system_controller.open_log_view()
 
     def list_logs(self):
-        if not self.__logs:
-            self.__view.display_msg('O hospital ainda não tem logs.', success=False)
-        else:
-            self.__view.list_logs(self.__logs)
+        logs = self.__dao.get_all()
+        self.__view.list_logs(logs)
         self.__system_controller.open_log_view()

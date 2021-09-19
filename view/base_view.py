@@ -59,29 +59,6 @@ class BaseView(ABC):
         print(self.format_menu_name_to_fit_hospital_header(menu_name))
 
     @staticmethod
-    def ask_for_cpf():
-        """
-        Asks for CPF
-        :return: given cpf
-        """
-        return input('CPF (apenas números): ')
-
-    def ask_for_main_info(self):
-        """
-        Display main info inputs
-        :return: tuple containing info gathered from the inputs
-        """
-        while True:
-            name = input('Nome completo: ')
-            if not name:
-                self.display_msg('[!] O nome é obrigatório!')
-                continue
-            break
-        phone_number = input('Telefone com DDD (apenas números): ')
-        date_of_birth = input('Data de nascimento (DD/MM/AAAA): ')
-        return name, phone_number, date_of_birth
-
-    @staticmethod
     def display_msg(msg: str, success):
         sg.Popup('Sucesso' if success else 'Erro', msg, font=('Helvetica', 15))
 

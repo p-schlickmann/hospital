@@ -1,3 +1,5 @@
+import PySimpleGUI as sg
+
 from model.health_status import POSSIBLE_STATUS
 from .base_view import BaseView
 
@@ -5,29 +7,37 @@ from .base_view import BaseView
 class PatientView(BaseView):
     def __init__(self):
         super().__init__()
+        self.__window = None
 
-    def display_options(self):
-        """
-        Displays system options
-        :return: chosen option
-        """
-        self.display_header('Pacientes')
-        print("1 - Admitir paciente")
-        print("2 - Atender paciente da fila")
-        print("3 - Dar alta para paciente")
-        print("4 - Ver dados/histórico de um paciente")
-        print("5 - Excluir paciente")
-        print("6 - Ver fila de atendimento")
-        print("7 - Atualizar estado de saúde de um paciente")
-        print("0 - Voltar ao menu principal")
-        chosen_option = input("Digite o número da opção desejada: ")
-        return self.read_whole_number(chosen_option, {0, 1, 2, 3, 4, 5, 6, 7})
+    def init_components(self):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes', element_justification='c').Layout([
+            [sg.Text('Pacientes', font=('Helvetica', 25))],
+            [
+                self.blue_button('Admitir', 1),
+                self.blue_button('Atender', 2)
+            ],
+            [
+                self.blue_button('Dar alta', 3),
+                self.blue_button('Ver dados/histórico', 4)
+            ],
+            [
+                self.blue_button('Ver fila de atendimento', 6),
+                self.blue_button('Atualizar estado de saúde', 7),
+            ],
+            [
+                self.blue_button('Excluir', 5),
+                self.blue_button('Menu principal', 0)
+            ]
+        ])
+        self.__window = window
 
     def open(self):
-        pass
+        button, values = self.__window.Read()
+        return button, values
 
     def close(self):
-        pass
+        self.__window.Close()
 
     def show_waiting_line(self, line: list):
         """
@@ -35,10 +45,20 @@ class PatientView(BaseView):
         :param line: list of patients in the line
         :return: None
         """
-        if not line:
-            self.display_msg('[-] A fila de pacientes está vazia.')
-        for i, patient in enumerate(line):
-            print(f'{i + 1}. {patient["patient"].name} | gravidade: {patient["severity"]}')
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Listar', element_justification='c').Layout([
+            [sg.Text('Fila de atendimento', font=('Helvetica', 25))],
+            [[sg.Text('A fila de pacientes está vazia. :)', font=('Helvetica', 20))] for _ in range(1) if not line],
+            [
+                [
+                    sg.Text(f'{idx + 1}. {patient["patient"].name} | gravidade: {patient["severity"]}',
+                            font=('Helvetica', 20))] for idx, patient in enumerate(line)
+            ],
+            [self.blue_button('Voltar', 0)]
+        ])
+        self.__window = window
+        self.open()
+        self.close()
 
     def get_health_status(self, patient):
         """
@@ -54,9 +74,56 @@ class PatientView(BaseView):
         if chosen_status:
             return POSSIBLE_STATUS[chosen_status - 1]
 
+    def ask_for_cpf(self):
+        """
+        Asks for CPF
+        :return: given cpf
+        """
+
+        sg.ChangeLookAndFeel('Reddit')
+        input_font = ('Helvetica', 15)
+        input_size = (10, 2)
+        window = sg.Window('Hospital Mendes - Pacientes', element_justification='c').Layout([
+            [sg.Text(f'Digite o CPF do paciente', font=('Helvetica', 25))],
+            [sg.Text('CPF (apenas números)', font=input_font, size=input_size), sg.InputText(key='cpf', font=input_font)],
+            [self.blue_button('Voltar', 0), self.blue_button('Ok', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['cpf']
+
+    def ask_for_main_info(self):
+        """
+        Display main info inputs
+        :return: tuple containing info gathered from the inputs
+        """
+        input_font = ('Helvetica', 15)
+        input_size = (20, 2)
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Admitir', element_justification='c').Layout([
+            [sg.Text('Admitir paciente', font=('Helvetica', 25))],
+            [sg.Text('Nome completo', font=input_font, size=input_size), sg.InputText(key='name', font=input_font)],
+            [sg.Text('Telefone com DDD', font=input_font, size=input_size), sg.InputText(key='phone', font=input_font)],
+            [sg.Text('Contato de emergência com DDD', font=input_font, size=input_size),
+             sg.InputText(key='emergency', font=input_font)],
+            [sg.Text('Data de nascimento (DD/MM/AAAA)', font=input_font, size=input_size), sg.InputText(key='date_of_birth', font=input_font)],
+
+            [self.blue_button('Cancelar', 0), self.blue_button('Admitir', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['name'], values['phone'], values['emergency'], values['date_of_birth']
+
+
     @staticmethod
     def ask_for_emergency_contact():
-        return input('Contato de emergência com DDD (opcional, apenas números): ')
+        return input()
 
     @staticmethod
     def use_this_registry():

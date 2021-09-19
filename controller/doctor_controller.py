@@ -29,7 +29,7 @@ class DoctorController(BaseController):
         self.__view.display_header('Cadastrar médico')
         cpf = self.__view.ask_for_cpf()
         if not self.find_doctor_by_cpf(cpf, display_not_found_msg=False):
-            name, phone, birth, salary= self.__view.display_register_doctor()
+            name, phone, birth, salary = self.__view.display_register_doctor()
             doctor = Doctor(name, phone, cpf, birth, salary, on_call=False, available=True)
             self.__doctors.append(doctor)
             self.__view.display_msg('[+] Médico cadastado com sucesso!')
