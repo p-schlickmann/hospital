@@ -70,7 +70,7 @@ class DoctorView(BaseView):
         input_size = (10, 2)
         sg.ChangeLookAndFeel('Reddit')
         window = sg.Window('Hospital Mendes - Médicos - Editar', element_justification='c').Layout([
-            [sg.Text(f'Editar id do médico {doctor.id}', font=('Helvetica', 25))],
+            [sg.Text(f'Editar médico do id {doctor.id}', font=('Helvetica', 25))],
             [
                 sg.Text('Título', font=input_font, size=input_size),
                 sg.InputText(key='title', font=input_font, default_text=doctor.title)
