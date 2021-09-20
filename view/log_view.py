@@ -5,8 +5,12 @@ from .base_view import BaseView
 
 class LogView(BaseView):
     def __init__(self):
-        super().__init__()
+        super().__init__(self)
         self.__window = None
+
+    @property
+    def window(self):
+        return self.__window
 
     def init_components(self):
         sg.ChangeLookAndFeel('Reddit')
@@ -18,18 +22,11 @@ class LogView(BaseView):
             ],
             [
                 self.blue_button('Editar', 2),
-                self.blue_button('Deletar', 3)
+                self.blue_button('Excluir', 3)
             ],
             [self.blue_button('Menu principal', 0)]
         ])
         self.__window = window
-
-    def open(self):
-        button, values = self.__window.Read()
-        return button, values
-
-    def close(self):
-        self.__window.Close()
 
     def new_log(self):
         """

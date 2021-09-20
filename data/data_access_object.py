@@ -33,7 +33,7 @@ class DataAccessObject:
             self.__cache.pop(key)
             self.__dump()
         except KeyError:
-            pass
+            print('Error at remove')
 
     def get_all(self):
         return list(self.__cache.values())

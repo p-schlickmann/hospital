@@ -6,8 +6,12 @@ from .base_view import BaseView
 
 class PatientView(BaseView):
     def __init__(self):
-        super().__init__()
+        super().__init__(self)
         self.__window = None
+
+    @property
+    def window(self):
+        return self.__window
 
     def init_components(self):
         sg.ChangeLookAndFeel('Reddit')
@@ -31,13 +35,6 @@ class PatientView(BaseView):
             ]
         ])
         self.__window = window
-
-    def open(self):
-        button, values = self.__window.Read()
-        return button, values
-
-    def close(self):
-        self.__window.Close()
 
     def show_waiting_line(self, line: list):
         """
@@ -147,7 +144,7 @@ class PatientView(BaseView):
         sg.ChangeLookAndFeel('Reddit')
         window = sg.Window('Hospital Mendes - Pacientes - Admitir', element_justification='c').Layout([
             [sg.Text('Encontramos um cadastro previamente\npreenchido para esse paciente:', font=('Helvetica', 25))],
-            [sg.Text(self.display_person_info(patient, only_base_info=True), font=('Helvetica', 20))],
+            [sg.Text(self.display_person_info(patient), font=('Helvetica', 20))],
             [sg.Text('Deseja usar esse cadastro?', font=('Helvetica', 25))],
             [self.blue_button('Não', 0), self.blue_button('Sim', 1)]
         ])
@@ -200,17 +197,21 @@ class PatientView(BaseView):
             return False
         return values['name'], values['desc'], values['disc']
 
-    def display_patient_condition(self, patient, admittion_count):
+    @staticmethod
+    def display_patient_condition(patient, admittion_count):
         condition = [
             '_______________________________________________________________',
             f'{admittion_count} vez no hospital.',
         ]
         arrived_at = patient.arrived_at
         if arrived_at:
-            condition.append(f'Chegou: {arrived_at}')
+            condition.append(f'Chegou: {arrived_at.strftime("%d/%m/%Y %H:%M")}')
         admitted_at = patient.admitted_at
         if admitted_at:
-            condition.append(f'Admitido em: {admitted_at}')
+            condition.append(f'Admitido em: {admitted_at.strftime("%d/%m/%Y %H:%M")}')
+        diagnosed_at = patient.diagnosed_at
+        if diagnosed_at:
+            condition.append(f'Atendido em: {diagnosed_at.strftime("%d/%m/%Y %H:%M")}')
         doctors = patient.doctors
         if doctors:
             condition.append(f'Médicos: ')
@@ -218,7 +219,7 @@ class PatientView(BaseView):
                 condition.append(f'- {doc}')
         discharged_at = patient.discharged_at
         if discharged_at:
-            condition.append(f'Alta: {discharged_at}')
+            condition.append(f'Alta: {discharged_at.strftime("%d/%m/%Y %H:%M")}')
         if patient.illnesses:
             condition.append('Doenças: ')
             for illness in patient.illnesses:
@@ -234,7 +235,7 @@ class PatientView(BaseView):
         sg.ChangeLookAndFeel('Reddit')
         window = sg.Window('Hospital Mendes - Pacientes - Ver dados/histórico', element_justification='c').Layout([
             [sg.Text('Ver dados/histórico', font=('Helvetica', 25))],
-            [sg.Text(self.display_person_info(latest_admittion, only_base_info=True), font=('Helvetica', 20))],
+            [sg.Text(self.display_person_info(latest_admittion), font=('Helvetica', 20))],
             [[sg.Text(self.display_patient_condition(patient, idx + 1), font=('Helvetica', 20))] for idx, patient in enumerate(previous_admittions)],
             [self.blue_button('Voltar', 0)]
         ])

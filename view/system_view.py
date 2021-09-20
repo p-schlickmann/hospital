@@ -5,8 +5,12 @@ from .base_view import BaseView
 
 class SystemView(BaseView):
     def __init__(self):
-        super().__init__()
+        super().__init__(self)
         self.__window = None
+
+    @property
+    def window(self):
+        return self.__window
 
     def init_components(self):
         sg.ChangeLookAndFeel('Reddit')
@@ -22,13 +26,3 @@ class SystemView(BaseView):
             ]
         ])
         self.__window = window
-
-    def open(self):
-        button, values = self.__window.Read()
-        return button, values
-
-    def close(self):
-        try:
-            self.__window.Close()
-        except AttributeError:
-            pass

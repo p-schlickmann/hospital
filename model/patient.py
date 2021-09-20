@@ -13,6 +13,7 @@ class Patient(Person):
         self.__emergency_contact = emergency_contact
         self.__arrived_at = arrived_at
         self.__admitted_at = admitted_at
+        self.__diagnosed_at = None
         self.__health_status = ''
         self.__discharged_at = None
         self.__doctors = []
@@ -45,6 +46,14 @@ class Patient(Person):
     @admitted_at.setter
     def admitted_at(self, admitted_at: datetime):
         self.__admitted_at = admitted_at
+
+    @property
+    def diagnosed_at(self):
+        return self.__diagnosed_at
+
+    @diagnosed_at.setter
+    def diagnosed_at(self, diagnosed_at: datetime):
+        self.__diagnosed_at = diagnosed_at
         
     @property
     def discharged_at(self):

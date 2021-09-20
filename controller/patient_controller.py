@@ -10,7 +10,6 @@ from view.patient_view import PatientView
 
 class PatientController(BaseController):
     def __init__(self, system_controller):
-        self.__patients = []
         self.__patients_line = []
         self.__system_controller = system_controller
         self.__view = PatientView()
@@ -75,6 +74,7 @@ class PatientController(BaseController):
                 health_status = self.__view.get_health_status(patient)
                 if health_status:
                     patient.health_status = health_status
+
                     patient_cpf = patient.cpf
                     self.__patients_line = [patient for patient in self.__patients_line if patient['patient'].cpf != patient_cpf]
                     cpfs = self.__view.get_doctors_that_diagnosed_the_patient()
@@ -85,6 +85,7 @@ class PatientController(BaseController):
                                 patient.add_doctor(doc)
 
                     self.__view.display_msg('Paciente atendido com sucesso!', success=True)
+            patient.diagnosed_at = datetime.now()
         self.__dao.edit_current_patient(patient.cpf, patient)
         self.__system_controller.open_patient_view()
 
@@ -138,14 +139,17 @@ class PatientController(BaseController):
         if cpf:
             patient = self.find_patient_by_cpf(cpf, display_not_found_msg=True, not_discharged=True)
             if patient is not None:
-                if self.__view.confirm_patient_discharge(patient):
-                    patient_to_discharge_cpf = patient.cpf
-                    self.__patients_line = [
-                        patient for patient in self.__patients_line if patient['patient'].cpf != patient_to_discharge_cpf
-                    ]
-                    patient.discharged_at = datetime.now()
-                    self.__dao.edit_current_patient(patient.cpf, patient)
-                    self.__view.display_msg(f'{patient.name} recebeu alta!', success=True)
+                if not patient.diagnosed_at:
+                    self.__view.display_msg('Esse paciente ainda não foi atendido!', success=False)
+                else:
+                    if self.__view.confirm_patient_discharge(patient):
+                        patient_to_discharge_cpf = patient.cpf
+                        self.__patients_line = [
+                            patient for patient in self.__patients_line if patient['patient'].cpf != patient_to_discharge_cpf
+                        ]
+                        patient.discharged_at = datetime.now()
+                        self.__dao.edit_current_patient(patient.cpf, patient)
+                        self.__view.display_msg(f'{patient.name} recebeu alta!', success=True)
         self.__system_controller.open_patient_view()
 
     def get_patient_history_and_data(self):
