@@ -69,10 +69,11 @@ class BaseView(ABC):
         :param person: patient or doctor instance
         :return: None
         """
-        print(f'Nome: {person.name}')
-        print(f'Data de nascimento: {person.date_of_birth}')
-        print(f'CPF: {person.cpf}')
-        print(f'Celular: {person.phone_number}')
+        info = []
+        info.append(f'Nome: {person.name}')
+        info.append(f'Data de nascimento: {person.date_of_birth}')
+        info.append(f'CPF: {person.cpf}')
+        info.append(f'Celular: {person.phone_number}')
         if isinstance(person, Doctor):
             print(f'Salário: {person.salary}')
             print(f'Disponível: {"sim" if person.available else "nao"}')
@@ -81,10 +82,10 @@ class BaseView(ABC):
             if not only_base_info:
                 arrived_at = person.arrived_at
                 if arrived_at:
-                    print(f'Chegou: {arrived_at}')
+                    print(f'Chegou: {arrived_at.strftime("%d/%m/%Y %H:%M")}')
                 admitted_at = person.admitted_at
                 if admitted_at:
-                    print(f'Admitido em: {admitted_at}')
+                    print(f'Admitido em: {admitted_at.strftime("%d/%m/%Y %H:%M")}')
                 doctors = person.doctors
                 if doctors:
                     print(f'Médicos: ')
@@ -93,7 +94,8 @@ class BaseView(ABC):
                 discharged_at = person.discharged_at
                 if discharged_at:
                     print(f'Alta: {discharged_at}')
-            print(f'Contato de emergência: {person.emergency_contact}')
+            info.append(f'Contato de emergência: {person.emergency_contact}')
+        return '\n'.join(info)
 
     @staticmethod
     def confirm_action(msg):

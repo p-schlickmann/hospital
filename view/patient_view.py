@@ -66,13 +66,27 @@ class PatientView(BaseView):
         :param patient: Patient instance
         :return: new health status, None if chosen status is invalid
         """
-        print('Selecione um estado de saúde para o paciente')
-        for idx, status in enumerate(POSSIBLE_STATUS):
-            print(f'[{idx + 1}] {status} {"(atual)" if status == patient.health_status else ""}')
-        possible_indexes = {idx for idx, status in enumerate(POSSIBLE_STATUS)}
-        chosen_status = self.read_whole_number(input('Digite o número do status desejado: '), possible_indexes)
-        if chosen_status:
-            return POSSIBLE_STATUS[chosen_status - 1]
+        sg.ChangeLookAndFeel('Reddit')
+        input_font = ('Helvetica', 15)
+        input_size = (10, 2)
+        window = sg.Window('Hospital Mendes - Pacientes - Admitir', element_justification='c').Layout([
+            [sg.Text(f'Selecione um estado de saúde para o paciente', font=('Helvetica', 25))],
+            [
+                [sg.Text(f'[{idx + 1}] {status} {"(atual)" if status == patient.health_status else ""}', font=input_font)] for idx, status in enumerate(POSSIBLE_STATUS)
+            ],
+            [sg.Text('Número do status', font=input_font, size=input_size),
+             sg.InputText(key='status', font=input_font)],
+            [self.blue_button('Voltar', 0), self.blue_button('Salvar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        try:
+            return POSSIBLE_STATUS[int(values['status']) - 1]
+        except ValueError:
+            self.display_msg('Entre um numero inteiro valido!', success=False)
 
     def ask_for_cpf(self):
         """
@@ -125,91 +139,150 @@ class PatientView(BaseView):
     def ask_for_emergency_contact():
         return input()
 
-    @staticmethod
-    def use_this_registry():
+    def use_this_registry(self, patient):
         """
         Asks if the user wants to use the previously registered patient info
         :return: True if yes, False otherwise
         """
-        answer = input('Deseja usar esse cadastro? [s/N]: ')
-        return answer in {'s', 'S'}
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Admitir', element_justification='c').Layout([
+            [sg.Text('Encontramos um cadastro previamente\npreenchido para esse paciente:', font=('Helvetica', 25))],
+            [sg.Text(self.display_person_info(patient, only_base_info=True), font=('Helvetica', 20))],
+            [sg.Text('Deseja usar esse cadastro?', font=('Helvetica', 25))],
+            [self.blue_button('Não', 0), self.blue_button('Sim', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        return int(button) == 1
 
-    @staticmethod
-    def enter_illnesses():
+    def enter_illness(self, patient):
         """
         Enter patient identified illnesses
         :return: list of entered illnesses
         """
-        illnesses = []
-        while True:
-            name = input('Nome da doença: ')
-            description = input('Descrição: ')
-            severity = input('Gravidade: ')
-            illnesses.append({'name': name, 'description': description, 'severity': severity})
-            add_another = input('Adicionar outra doença? [s/N]: ')
-            if add_another not in {'s', 'S'}:
-                break
-        return illnesses
+        input_font = ('Helvetica', 15)
+        input_size = (20, 2)
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Atender', element_justification='c').Layout([
+            [sg.Text(f'Atendendo o paciente {patient.name}', font=('Helvetica', 25))],
+            [sg.Text('Nome da doença', font=input_font, size=input_size), sg.InputText(key='name', font=input_font)],
+            [sg.Text('Gravidade', font=input_font, size=input_size), sg.InputText(key='severity', font=input_font)],
+            [sg.Text('Descrição', font=input_font, size=input_size), sg.InputText(key='desc', font=input_font)],
+            [self.blue_button('Cancelar', 0), self.blue_button('Adicionar doença', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['name'], values['desc'], values['severity']
 
-    @staticmethod
-    def enter_symptoms():
+    def enter_symptom(self, patient):
         """
         Enter patient identified symptoms
         :return: list of entered symptoms
         """
-        symptoms = []
-        while True:
-            name = input('Nome do sintoma: ')
-            description = input('Descrição: ')
-            discomfort_level = input('Grau de desconforto (0 a 10): ')
-            symptoms.append({'name': name, 'description': description, 'discomfort_level': discomfort_level})
-            add_another = input('Adicionar outro sintoma? [s/N]: ')
-            if add_another not in {'s', 'S'}:
-                break
-        return symptoms
+        input_font = ('Helvetica', 15)
+        input_size = (20, 2)
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Atender', element_justification='c').Layout([
+            [sg.Text(f'Atendendo o paciente {patient.name}', font=('Helvetica', 25))],
+            [sg.Text('Nome da sintoma', font=input_font, size=input_size), sg.InputText(key='name', font=input_font)],
+            [sg.Text('Grau de desconforto', font=input_font, size=input_size), sg.InputText(key='disc', font=input_font)],
+            [sg.Text('Descrição', font=input_font, size=input_size), sg.InputText(key='desc', font=input_font)],
+            [self.blue_button('Cancelar', 0), self.blue_button('Adicionar sintoma', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        if int(button) == 0:
+            return False
+        return values['name'], values['desc'], values['disc']
 
     def display_patient_condition(self, patient, admittion_count):
-        print('-----------------')
-        print(f'{admittion_count} vez no hospital.')
+        condition = [
+            '_______________________________________________________________',
+            f'{admittion_count} vez no hospital.',
+        ]
         arrived_at = patient.arrived_at
         if arrived_at:
-            print(f'Chegou: {arrived_at}')
+            condition.append(f'Chegou: {arrived_at}')
         admitted_at = patient.admitted_at
         if admitted_at:
-            print(f'Admitido em: {admitted_at}')
+            condition.append(f'Admitido em: {admitted_at}')
         doctors = patient.doctors
         if doctors:
-            print(f'Médicos: ')
+            condition.append(f'Médicos: ')
             for doc in doctors:
-                print(f'- {doc}')
+                condition.append(f'- {doc}')
         discharged_at = patient.discharged_at
         if discharged_at:
-            print(f'Alta: {discharged_at}')
+            condition.append(f'Alta: {discharged_at}')
         if patient.illnesses:
-            print('Doenças: ')
+            condition.append('Doenças: ')
             for illness in patient.illnesses:
-                print(f'- {illness}')
+                condition.append(f'- {illness}')
         if patient.symptoms:
-            print('Sintomas: ')
+            condition.append('Sintomas: ')
             for symptom in patient.symptoms:
-                print(f'- {symptom}')
+                condition.append(f'- {symptom}')
+        return '\n'.join(condition)
 
     def display_patient_history(self, previous_admittions):
-        if not previous_admittions:
-            print('[-] Esse paciente não tem histórico de internação no nosso hospital')
-        else:
-            self.display_person_info(previous_admittions[0], only_base_info=True)
-            for idx, patient in enumerate(previous_admittions):
-                self.display_patient_condition(patient, idx + 1)
+        *_, latest_admittion = previous_admittions
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Ver dados/histórico', element_justification='c').Layout([
+            [sg.Text('Ver dados/histórico', font=('Helvetica', 25))],
+            [sg.Text(self.display_person_info(latest_admittion, only_base_info=True), font=('Helvetica', 20))],
+            [[sg.Text(self.display_patient_condition(patient, idx + 1), font=('Helvetica', 20))] for idx, patient in enumerate(previous_admittions)],
+            [self.blue_button('Voltar', 0)]
+        ])
+        self.__window = window
+        self.open()
+        self.close()
 
     def get_doctors_that_diagnosed_the_patient(self):
-        print('Digite o CPF de um dos médicos que atendeu esse paciente (deixar em branco para pular): ')
         cpfs = []
-        add_another = True
-        while add_another:
-            cpf = input('CPF: ')
-            cpfs.append(cpf)
-            if not cpf:
-                break
-            add_another = self.confirm_action('Adicionar outro médico?')
-        return cpfs
+        i = 0
+        while True:
+            sg.ChangeLookAndFeel('Reddit')
+            input_font = ('Helvetica', 15)
+            input_size = (10, 2)
+            window = sg.Window('Hospital Mendes - Pacientes', element_justification='c').Layout([
+                [sg.Text(f'Digite o(s) CPF(s) do(s) médico(s) que \natendeu/atenderam esse paciente', font=('Helvetica', 25))],
+                [sg.Text('CPF (apenas números)', font=input_font, size=input_size),
+                 sg.InputText(key='cpf', font=input_font)],
+                [self.blue_button('Finalizar', 0), self.blue_button('Adicionar' if i == 0 else 'Adicionar outro', 1)]
+            ])
+            self.__window = window
+            button, values = self.open()
+            self.close()
+            i = i + 1
+            if int(button) == 0:
+                return cpfs
+            cpfs.append(values['cpf'])
+
+    def confirm_patient_discharge(self, patient):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Alta', element_justification='c').Layout([
+               [sg.Text('Dar alta para o paciente encontrado?', font=('Helvetica', 25))],
+               [sg.Text(patient, font=('Helvetica', 20))],
+               [self.blue_button('Cancelar', 0), self.blue_button('Confirmar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        return int(button) == 1
+
+    def confirm_patient_deletion(self, patient):
+        sg.ChangeLookAndFeel('Reddit')
+        window = sg.Window('Hospital Mendes - Pacientes - Excluir', element_justification='c').Layout([
+            [sg.Text('Excluir todas as informações do paciente selecionado?', font=('Helvetica', 25))],
+            [sg.Text(patient, font=('Helvetica', 20))],
+            [self.blue_button('Cancelar', 0), self.blue_button('Confirmar', 1)]
+        ])
+        self.__window = window
+        button, values = self.open()
+        self.close()
+        return int(button) == 1

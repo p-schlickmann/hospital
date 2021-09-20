@@ -17,8 +17,8 @@ class DataAccessObject:
     def __load(self):
         self.__cache = pickle.load(open(self.__datasource, 'rb'))
 
-    def add(self, key, obj):
-        if obj is not None and isinstance(obj, self.__instance):
+    def add(self, key, obj, force_insert=False):
+        if obj is not None and (isinstance(obj, self.__instance) or force_insert):
             self.__cache[key] = obj
             self.__dump()
 
