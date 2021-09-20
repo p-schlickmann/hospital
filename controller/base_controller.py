@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from exceptions import NoPatientInLineException, LogNotFoundException
+
 
 class BaseController(ABC):
     @abstractmethod
@@ -12,7 +14,12 @@ class BaseController(ABC):
         chosen_option, _ = self.__view.open()
         if chosen_option is not None:
             self.__view.close()
-            options[chosen_option]()
+            try:
+                options[chosen_option]()
+            except NoPatientInLineException:
+                self.__view.display_msg('Nenhum paciente na fila!', success=False)
+            except LogNotFoundException:
+                self.__view.display_msg(f'Nenhum log encontrado com esse id!', success=False)
 
     def return_to_main_menu(self):
         """

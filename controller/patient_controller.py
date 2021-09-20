@@ -3,6 +3,7 @@ from random import randint
 
 from controller.base_controller import BaseController
 from data.patient_dao import PatientDAO
+from exceptions import NoPatientInLineException
 from model.illness import Illness
 from model.patient import Patient
 from view.patient_view import PatientView
@@ -57,11 +58,9 @@ class PatientController(BaseController):
             return Patient(name, phone, cpf, birth, emergency_contact, arrived_at, admitted_at)
 
     def diagnose(self):
-        try:
-            patient = self.__patients_line[0]['patient']
-        except IndexError:
-            self.__view.display_msg('Nenhum paciente na fila!', success=False)
-            return
+        if not self.__patients_line:
+            raise NoPatientInLineException
+        patient = self.__patients_line[0]['patient']
         symptom = self.__view.enter_symptom(patient)
         if symptom:
             name, desc, discomfort_level = symptom

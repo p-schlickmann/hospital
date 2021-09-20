@@ -2,6 +2,7 @@ from datetime import datetime
 
 from controller.base_controller import BaseController
 from data.data_access_object import DataAccessObject
+from exceptions import LogNotFoundException
 from model.log import Log
 from view.log_view import LogView
 
@@ -30,7 +31,7 @@ class LogController(BaseController):
         if log:
             return log
         else:
-            self.__view.display_msg(f'Nenhum log encontrado com esse id! ({id})', success=False)
+            raise LogNotFoundException
 
     def edit_log(self):
         id = self.__view.ask_for_log_id()
