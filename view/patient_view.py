@@ -131,11 +131,6 @@ class PatientView(BaseView):
             return False
         return values['name'], values['phone'], values['emergency'], values['date_of_birth']
 
-
-    @staticmethod
-    def ask_for_emergency_contact():
-        return input()
-
     def use_this_registry(self, patient):
         """
         Asks if the user wants to use the previously registered patient info

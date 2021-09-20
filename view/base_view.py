@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import PySimpleGUI as sg
 
 from model.doctor import Doctor
-from model.patient import Patient
 
 
 class BaseView(ABC):
